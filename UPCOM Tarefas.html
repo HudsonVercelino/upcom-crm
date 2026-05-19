@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UPCOM · Tarefas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+/* UPCOM Digital — base */
+:root {
+  --upcom-coral: #E85D44;
+  --upcom-coral-dark: #C94A33;
+  --upcom-coral-light: #FFE4DD;
+  --upcom-coral-50: #FFF5F2;
+  --bg: #F7F5F2;
+  --surface: #FFFFFF;
+  --surface-2: #FAF8F5;
+  --border: #ECE7E0;
+  --border-strong: #D9D2C8;
+  --ink: #0E0E0E;
+  --ink-2: #2A2A2A;
+  --muted: #6B6760;
+  --muted-2: #9B9690;
+  --success: #2F8F5F;
+  --success-bg: #E5F3EC;
+  --warn: #C77A1B;
+  --warn-bg: #FBF0DD;
+  --danger: #C2392E;
+  --danger-bg: #FBE5E2;
+  --info: #2C6BB8;
+  --info-bg: #E2EDF9;
+  --font-sans: "Inter Tight", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter Tight", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --r-xs: 4px; --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px;
+  --shadow-sm: 0 1px 2px rgba(14,14,14,0.04),0 1px 1px rgba(14,14,14,0.02);
+  --shadow-md: 0 4px 12px rgba(14,14,14,0.06),0 1px 2px rgba(14,14,14,0.04);
+  --shadow-lg: 0 12px 32px rgba(14,14,14,0.08),0 2px 4px rgba(14,14,14,0.04);
+  --sidebar-w: 232px;
+  --sidebar-w-collapsed: 64px;
+  --topbar-h: 56px;
+}
+[data-theme="dark"] {
+  --bg: #0E0D0C; --surface: #1A1916; --surface-2: #15140F;
+  --border: #2A2823; --border-strong: #3A372F;
+  --ink: #F5F1EB; --ink-2: #E5DFD5; --muted: #9B9690; --muted-2: #6B6760;
+  --upcom-coral-light: #3A1E16; --upcom-coral-50: #221310;
+  --success-bg: #142A1F; --warn-bg: #2A1F0C; --danger-bg: #2A1410; --info-bg: #0E1F33;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.35);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+}
+* { box-sizing: border-box; }
+html,body { margin:0;padding:0;font-family:var(--font-sans);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale; }
+button { font-family:inherit;cursor:pointer; }
+.app { display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh;transition:grid-template-columns 240ms cubic-bezier(.2,.7,.2,1); }
+.app.collapsed { grid-template-columns:var(--sidebar-w-collapsed) 1fr; }
+.sidebar { background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:hidden; }
+.brand { display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--border);height:var(--topbar-h);flex-shrink:0; }
+.brand-mark { width:28px;height:28px;background:var(--upcom-coral);border-radius:7px;display:grid;place-items:center;flex-shrink:0;position:relative; }
+.brand-mark::after { content:"";width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:9px solid #fff;transform:translateY(-1px); }
+.brand-text { font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:-0.02em;color:var(--ink);white-space:nowrap; }
+.brand-text em { font-style:normal;color:var(--upcom-coral);font-weight:800; }
+.collapsed .brand-text,.collapsed .nav-label,.collapsed .nav-section-label,.collapsed .sidebar-footer-text { display:none; }
+.collapsed .nav-item { justify-content:center; }
+.nav { flex:1;overflow-y:auto;padding:12px 10px; }
+.nav-section { margin-bottom:18px; }
+.nav-section-label { font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted-2);padding:6px 12px 8px; }
+.nav-item { display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:var(--r-sm);color:var(--ink-2);cursor:pointer;font-size:13.5px;font-weight:500;margin-bottom:1px;position:relative;white-space:nowrap;transition:background 120ms; }
+.nav-item:hover { background:var(--surface-2); }
+.nav-item.active { background:var(--upcom-coral-50);color:var(--upcom-coral); }
+.nav-item.active::before { content:"";position:absolute;left:-10px;top:8px;bottom:8px;width:3px;background:var(--upcom-coral);border-radius:0 3px 3px 0; }
+.nav-item svg { flex-shrink:0; }
+.nav-badge { margin-left:auto;background:var(--upcom-coral);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;min-width:18px;text-align:center; }
+.nav-item:not(.active) .nav-badge { background:var(--border-strong);color:var(--ink-2); }
+.sidebar-footer { padding:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px; }
+.avatar { width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--upcom-coral) 0%,var(--upcom-coral-dark) 100%);color:#fff;font-weight:700;font-size:12px;display:grid;place-items:center;flex-shrink:0; }
+.sidebar-footer-text { line-height:1.2; }
+.sidebar-footer-name { font-size:13px;font-weight:600;color:var(--ink); }
+.sidebar-footer-role { font-size:11px;color:var(--muted); }
+.main { display:flex;flex-direction:column;min-width:0; }
+.topbar { height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:10; }
+.topbar-toggle { background:transparent;border:0;color:var(--ink);padding:6px;border-radius:var(--r-sm);display:grid;place-items:center; }
+.topbar-toggle:hover { background:var(--surface-2); }
+.search { flex:1;max-width:420px;position:relative; }
+.search input { width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 12px 7px 34px;font-size:13px;color:var(--ink);font-family:inherit;outline:none;transition:border-color 120ms,background 120ms; }
+.search input:focus { border-color:var(--upcom-coral);background:var(--surface); }
+.search input::placeholder { color:var(--muted-2); }
+.search svg { position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted); }
+.search kbd { position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:var(--font-mono);font-size:10px;background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:var(--muted); }
+.topbar-spacer { flex:1; }
+.topbar-actions { display:flex;align-items:center;gap:6px; }
+.icon-btn { background:transparent;border:0;width:34px;height:34px;border-radius:var(--r-sm);display:grid;place-items:center;color:var(--ink-2);position:relative; }
+.icon-btn:hover { background:var(--surface-2); }
+.icon-btn .dot { position:absolute;top:8px;right:8px;width:7px;height:7px;background:var(--upcom-coral);border-radius:50%;border:2px solid var(--surface); }
+.btn-primary { background:var(--upcom-coral);color:#fff;border:0;padding:8px 14px;border-radius:var(--r-sm);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;transition:background 120ms; }
+.btn-primary:hover { background:var(--upcom-coral-dark); }
+.btn-secondary { background:var(--surface);color:var(--ink);border:1px solid var(--border-strong);padding:7px 12px;border-radius:var(--r-sm);font-weight:500;font-size:13px;display:inline-flex;align-items:center;gap:6px; }
+.btn-secondary:hover { background:var(--surface-2); }
+.content { padding:24px;display:flex;flex-direction:column;gap:16px;max-width:1600px;width:100%;margin:0 auto; }
+.page-header { display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap; }
+.page-title-block { display:flex;flex-direction:column;gap:4px; }
+.page-title { font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-0.02em;color:var(--ink);margin:0;line-height:1.1; }
+.page-subtitle { color:var(--muted);font-size:13.5px; }
+.page-subtitle strong { color:var(--ink-2);font-weight:600; }
+.filters { display:flex;gap:8px;align-items:center;flex-wrap:wrap; }
+.card { background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;overflow:hidden; }
+.table-wrap { overflow-x:auto; }
+table.data { width:100%;border-collapse:separate;border-spacing:0;font-size:13px; }
+table.data th { text-align:left;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface-2);white-space:nowrap; }
+table.data td { padding:12px 14px;border-bottom:1px solid var(--border);color:var(--ink-2);vertical-align:middle; }
+table.data tr { transition:background 100ms;cursor:pointer; }
+table.data tbody tr:hover { background:var(--surface-2); }
+table.data tbody tr:last-child td { border-bottom:0; }
+.team-stack { display:flex; }
+.team-stack .avatar { width:24px;height:24px;font-size:9.5px;border:2px solid var(--surface);margin-left:-7px; }
+.team-stack .avatar:first-child { margin-left:0; }
+.deadline-cell { font-family:var(--font-mono);font-size:12px; }
+.deadline-cell.late { color:var(--danger);font-weight:600; }
+.deadline-cell.soon { color:var(--warn);font-weight:600; }
+::-webkit-scrollbar { width:10px;height:10px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border-strong);border-radius:999px;border:2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background:var(--muted-2); }
+
+/* Tasks styles */
+.tasks-toolbar { display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 0; }
+.tasks-toolbar .search { max-width:280px;flex:0 1 280px; }
+.tasks-toolbar .spacer { flex:1; }
+.sprint-bar { display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 18px;gap:16px;box-shadow:var(--shadow-sm);flex-wrap:wrap; }
+.sprint-info { display:flex;flex-direction:column;gap:3px;min-width:0; }
+.sprint-name { font-family:var(--font-display);font-weight:700;font-size:16px;letter-spacing:-0.01em;color:var(--ink);display:flex;align-items:center;gap:8px; }
+.sprint-name .pill { background:var(--upcom-coral-light);color:var(--upcom-coral-dark);font-family:var(--font-mono);font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px; }
+.sprint-meta { font-size:12px;color:var(--muted); }
+.sprint-progress { flex:1;max-width:360px;min-width:220px; }
+.sprint-progress-track { height:8px;background:var(--surface-2);border:1px solid var(--border);border-radius:999px;overflow:hidden;position:relative;display:flex; }
+.sprint-progress-track>div { height:100%;transition:width 400ms cubic-bezier(.2,.7,.2,1); }
+.sprint-progress-track .seg-done { background:var(--success); }
+.sprint-progress-track .seg-doing { background:var(--upcom-coral); }
+.sprint-progress-track .seg-review { background:var(--warn); }
+.sprint-progress-numbers { display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--muted); }
+.sprint-progress-numbers strong { color:var(--ink);font-weight:700; }
+.sprint-team { display:flex;align-items:center;gap:12px; }
+.sprint-team-label { font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;font-weight:600; }
+.view-switch { display:flex;gap:0;border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden; }
+.view-switch button { background:var(--surface);border:0;padding:6px 12px;font-size:12px;font-weight:500;color:var(--muted);display:inline-flex;align-items:center;gap:5px;border-right:1px solid var(--border); }
+.view-switch button:last-child { border-right:0; }
+.view-switch button.active { background:var(--ink);color:var(--bg); }
+.filter-chip { background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:6px 10px;font-size:12px;color:var(--ink-2);display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-weight:500; }
+.filter-chip:hover { border-color:var(--border-strong); }
+.filter-chip.active { background:var(--upcom-coral-50);border-color:var(--upcom-coral);color:var(--upcom-coral-dark); }
+.assignee-filters { display:flex;gap:4px;align-items:center; }
+.assignee-chip { width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;display:grid;place-items:center;font-size:10px;font-weight:700;color:#fff;position:relative;transition:transform 100ms;padding:0;background:transparent; }
+.assignee-chip:hover { transform:translateY(-1px); }
+.assignee-chip.active { border-color:var(--upcom-coral); }
+.assignee-chip .av { width:100%;height:100%;border-radius:50%;display:grid;place-items:center;color:#fff; }
+.board-wrap { margin:0 -24px;padding:0 24px 24px;overflow-x:auto; }
+.board { display:grid;grid-auto-flow:column;grid-auto-columns:300px;gap:14px;align-items:flex-start;min-height:calc(100vh - 320px);padding-bottom:8px; }
+.column { background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-lg);display:flex;flex-direction:column;max-height:calc(100vh - 120px);transition:background 120ms,border-color 120ms; }
+.column.drag-over { background:var(--upcom-coral-50);border-color:var(--upcom-coral);border-style:dashed; }
+.col-header { display:flex;align-items:center;justify-content:space-between;padding:12px 14px 8px;gap:8px;flex-shrink:0; }
+.col-title { display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--ink); }
+.col-dot { width:8px;height:8px;border-radius:50%; }
+.col-dot.backlog { background:var(--muted-2); }
+.col-dot.todo { background:var(--info); }
+.col-dot.doing { background:var(--upcom-coral); }
+.col-dot.review { background:var(--warn); }
+.col-dot.client { background:#9333EA; }
+.col-dot.done { background:var(--success); }
+.col-count { font-family:var(--font-mono);font-size:11px;color:var(--muted);font-weight:500; }
+.col-wip { font-family:var(--font-mono);font-size:10px;background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:var(--muted); }
+.col-wip.over { background:var(--danger-bg);border-color:var(--danger);color:var(--danger); }
+.col-actions { display:flex;gap:2px; }
+.col-actions .icon-btn { width:24px;height:24px; }
+.col-body { display:flex;flex-direction:column;gap:8px;padding:4px 10px 10px;overflow-y:auto;flex:1; }
+.col-add { background:transparent;border:1px dashed var(--border-strong);border-radius:var(--r-md);padding:8px;color:var(--muted);font-size:12.5px;font-weight:500;display:flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:all 120ms; }
+.col-add:hover { color:var(--upcom-coral);border-color:var(--upcom-coral);background:var(--upcom-coral-50); }
+.task-card { background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 12px 10px;display:flex;flex-direction:column;gap:8px;cursor:grab;box-shadow:var(--shadow-sm);transition:transform 120ms,box-shadow 120ms,border-color 120ms;position:relative;border-left:3px solid var(--border-strong); }
+.task-card:hover { border-color:var(--border-strong);box-shadow:var(--shadow-md);transform:translateY(-1px); }
+.task-card.dragging { opacity:0.4;cursor:grabbing;transform:rotate(1.5deg) scale(1.02); }
+.task-card.priority-high { border-left-color:var(--danger); }
+.task-card.priority-med { border-left-color:var(--warn); }
+.task-card.priority-low { border-left-color:var(--success); }
+.task-card.overdue { background:linear-gradient(180deg,var(--danger-bg) 0%,var(--surface) 32%); }
+.task-card.blocked { background:linear-gradient(180deg,#FBE5E2 0%,var(--surface) 32%); }
+.task-card.done { opacity:0.72; }
+.task-top { display:flex;align-items:flex-start;justify-content:space-between;gap:6px; }
+.task-id { font-family:var(--font-mono);font-size:10px;color:var(--muted);font-weight:500; }
+.task-priority { font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;padding:1px 5px;border-radius:3px;display:inline-flex;align-items:center;gap:3px; }
+.task-priority.priority-high { background:var(--danger-bg);color:var(--danger); }
+.task-priority.priority-med { background:var(--warn-bg);color:var(--warn); }
+.task-priority.priority-low { background:var(--success-bg);color:var(--success); }
+.task-title { font-size:13px;font-weight:600;color:var(--ink);line-height:1.35;letter-spacing:-0.005em;text-wrap:pretty; }
+.task-card.done .task-title { text-decoration:line-through;text-decoration-color:var(--muted-2); }
+.task-labels { display:flex;flex-wrap:wrap;gap:4px; }
+.task-label { font-size:10px;font-weight:600;padding:1px 6px;border-radius:3px;background:var(--surface-2);color:var(--ink-2);border:1px solid var(--border);text-transform:lowercase;letter-spacing:0.01em; }
+.task-project { display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);font-weight:500; }
+.task-project .pdot { width:8px;height:8px;border-radius:2px;flex-shrink:0; }
+.task-progress { height:4px;background:var(--border);border-radius:999px;overflow:hidden; }
+.task-progress>div { height:100%;background:var(--upcom-coral);border-radius:999px; }
+.task-meta { display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:2px; }
+.task-meta-left { display:flex;align-items:center;gap:10px;color:var(--muted);font-size:11px; }
+.task-meta-item { display:inline-flex;align-items:center;gap:3px; }
+.task-meta-item.overdue { color:var(--danger);font-weight:600; }
+.task-meta-item.due-today { color:var(--warn);font-weight:600; }
+.task-meta-item.checklist-done { color:var(--success);font-weight:600; }
+.task-assignees { display:flex; }
+.task-assignees .av-mini { width:22px;height:22px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:9px;font-weight:700;border:2px solid var(--surface);margin-left:-6px;font-family:var(--font-display); }
+.task-assignees .av-mini:first-child { margin-left:0; }
+.task-flag { position:absolute;top:-1px;right:8px;background:var(--danger);color:#fff;font-size:9px;font-weight:700;padding:2px 6px 3px;border-radius:0 0 4px 4px;text-transform:uppercase;letter-spacing:0.06em; }
+.task-flag.blocked { background:var(--danger); }
+.task-flag.waiting { background:#9333EA; }
+.modal-backdrop { position:fixed;inset:0;background:rgba(14,14,14,0.45);backdrop-filter:blur(4px);z-index:100;display:grid;place-items:center;padding:24px;animation:fadeIn 160ms ease-out; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.modal { background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);max-width:720px;width:100%;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--border);animation:slideUp 220ms cubic-bezier(.2,.7,.2,1); }
+@keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+.modal-header { display:flex;align-items:flex-start;justify-content:space-between;padding:18px 22px 12px;gap:14px;border-bottom:1px solid var(--border); }
+.modal-title-block { display:flex;flex-direction:column;gap:4px;min-width:0; }
+.modal-id-row { display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted); }
+.modal-title { font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:-0.015em;color:var(--ink);margin:0;text-wrap:pretty; }
+.modal-body { display:grid;grid-template-columns:1fr 220px;gap:0;overflow-y:auto;flex:1; }
+.modal-main { padding:16px 22px;display:flex;flex-direction:column;gap:18px; }
+.modal-sidebar { background:var(--surface-2);border-left:1px solid var(--border);padding:16px 18px;display:flex;flex-direction:column;gap:14px;font-size:12px; }
+.modal-side-label { font-size:10px;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;color:var(--muted);margin-bottom:4px; }
+.modal-side-value { font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:6px;flex-wrap:wrap; }
+.modal-section-title { font-size:11px;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;color:var(--muted);margin:0 0 8px; }
+.modal-desc { font-size:13px;color:var(--ink-2);line-height:1.55;text-wrap:pretty; }
+.checklist-progress { height:4px;background:var(--border);border-radius:999px;margin-bottom:8px;overflow:hidden; }
+.checklist-progress>div { height:100%;background:var(--success); }
+.checklist-item { display:flex;align-items:center;gap:9px;padding:5px 0;font-size:13px;color:var(--ink-2);cursor:pointer; }
+.checklist-item input { accent-color:var(--upcom-coral); }
+.checklist-item.done { color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted-2); }
+.comment { display:flex;gap:10px;padding:8px 0; }
+.comment-body { flex:1;font-size:12.5px;color:var(--ink-2);line-height:1.45; }
+.comment-meta { font-size:11px;color:var(--muted);margin-bottom:2px; }
+.comment-meta strong { color:var(--ink);font-weight:600; }
+.comment-input { display:flex;gap:8px;align-items:flex-start;padding-top:8px;border-top:1px solid var(--border); }
+.comment-input textarea { flex:1;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:8px 10px;font-family:inherit;font-size:12.5px;color:var(--ink);resize:vertical;min-height:56px;outline:none; }
+.comment-input textarea:focus { border-color:var(--upcom-coral);background:var(--surface); }
+@media (max-width:900px) {
+  .app { grid-template-columns:var(--sidebar-w-collapsed) 1fr; }
+  .sidebar .nav-label,.sidebar .nav-section-label,.sidebar .brand-text,.sidebar-footer-text { display:none; }
+  .nav-item { justify-content:center; }
+  .modal-body { grid-template-columns:1fr; }
+  .modal-sidebar { border-left:0;border-top:1px solid var(--border); }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+// Auth guard
+(function() {
+  try {
+    const s = JSON.parse(localStorage.getItem('upcom_session'));
+    if (!s || !s.user) throw new Error();
+    window.UPCOM_USER = s;
+  } catch(e) {
+    window.location.replace('login.html');
+    document.write('');
+  }
+  window.upcomLogout = function() {
+    localStorage.removeItem('upcom_session');
+    window.location.replace('login.html');
+  };
+})();
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script>
+// tasks data
+window.UPCOM_TASKS = (function () {
+  const TEAM = [
+    { id: "rm", name: "Rafael Mendes", initials: "RM", color: "#E85D44" },
+    { id: "jt", name: "Júlia Tavares", initials: "JT", color: "#9333EA" },
+    { id: "ml", name: "Marcos Lima", initials: "ML", color: "#2C6BB8" },
+    { id: "cr", name: "Carolina Reis", initials: "CR", color: "#0F766E" },
+    { id: "ps", name: "Pedro Salles", initials: "PS", color: "#C77A1B" },
+    { id: "ts", name: "Tainá Souza", initials: "TS", color: "#B91C1C" },
+  ];
+  const PROJECTS = [
+    { id: "ns", name: "Nova Skin", color: "#1F1F1F" },
+    { id: "ap", name: "Anima Pet", color: "#3A86FF" },
+    { id: "fa", name: "Ferreira Adv.", color: "#0E2A47" },
+    { id: "vc", name: "Volpe Constr.", color: "#C77A1B" },
+    { id: "cc", name: "Cliché Café", color: "#7B3F00" },
+    { id: "sm", name: "Studio Mira", color: "#9333EA" },
+    { id: "oi", name: "Olivetti Imóveis", color: "#0F766E" },
+  ];
+  const COLUMNS = [
+    { id: "backlog", name: "Backlog", wip: null },
+    { id: "todo", name: "A fazer", wip: 8 },
+    { id: "doing", name: "Em andamento", wip: 4 },
+    { id: "review", name: "Em revisão", wip: 3 },
+    { id: "client", name: "Aguardando cliente", wip: null },
+    { id: "done", name: "Concluído", wip: null },
+  ];
+  const TODAY = new Date(2026, 4, 19);
+  const d = (offset) => { const dt = new Date(TODAY); dt.setDate(dt.getDate() + offset); return dt.toISOString().slice(0, 10); };
+  const T = [
+    { id: "T-401", title: "Refazer arquitetura de informação do Studio Mira", project: "sm", assignees: ["jt"], priority: "med", due: d(18), labels: ["UX","Discovery"], checklist: [0,5], comments: 2, attachments: 0, est: 8, col: "backlog" },
+    { id: "T-402", title: "Pesquisa de concorrentes — bistrôs autorais SP", project: null, assignees: ["cr"], priority: "low", due: d(22), labels: ["Research"], checklist: [0,3], comments: 0, attachments: 1, est: 4, col: "backlog" },
+    { id: "T-403", title: "Migrar pipeline antigo do CRM Pipefy → UPCOM", project: null, assignees: ["rm","ml"], priority: "low", due: null, labels: ["Interno","Ops"], checklist: [1,6], comments: 4, attachments: 2, est: 12, col: "backlog" },
+    { id: "T-404", title: "Definir KPIs de pós-entrega para todos os projetos", project: null, assignees: ["rm"], priority: "med", due: d(15), labels: ["Estratégia"], checklist: [0,4], comments: 1, attachments: 0, est: 3, col: "backlog" },
+    { id: "T-405", title: "Wireframes mobile — fluxo de cadastro Anima Pet", project: "ap", assignees: ["jt","cr"], priority: "high", due: d(3), labels: ["Design","Mobile"], checklist: [0,8], comments: 1, attachments: 3, est: 12, col: "todo" },
+    { id: "T-406", title: "Setup ambiente de homologação Volpe Construtora", project: "vc", assignees: ["ml"], priority: "high", due: d(2), labels: ["DevOps","Infra"], checklist: [0,5], comments: 0, attachments: 0, est: 6, col: "todo" },
+    { id: "T-407", title: "Conteúdo — página Sobre Nós da Ferreira Advogados", project: "fa", assignees: ["cr"], priority: "med", due: d(5), labels: ["Conteúdo","Copy"], checklist: [2,6], comments: 3, attachments: 1, est: 4, col: "todo" },
+    { id: "T-408", title: "Integração com Stripe — cobrança recorrente", project: "oi", assignees: ["ml","ps"], priority: "med", due: d(7), labels: ["Backend","API"], checklist: [0,9], comments: 2, attachments: 0, est: 16, col: "todo" },
+    { id: "T-409", title: "Brief de fotografia produto — sessão 12/05", project: "ns", assignees: ["jt"], priority: "low", due: d(8), labels: ["Produção"], checklist: [0,4], comments: 0, attachments: 2, est: 2, col: "todo" },
+    { id: "T-410", title: "Componente de checkout — variações A/B", project: "ns", assignees: ["jt","ml"], priority: "high", due: d(0), labels: ["Frontend","Design"], checklist: [4,7], comments: 6, attachments: 2, est: 14, col: "doing", progress: 65 },
+    { id: "T-411", title: "Cards de cases — grid responsivo", project: "fa", assignees: ["jt"], priority: "med", due: d(2), labels: ["Frontend"], checklist: [3,5], comments: 2, attachments: 0, est: 8, col: "doing", progress: 70 },
+    { id: "T-412", title: "Auth multi-tenant — refactor", project: "ap", assignees: ["ml"], priority: "high", due: d(-1), labels: ["Backend","Crítico"], checklist: [5,9], comments: 12, attachments: 1, est: 24, col: "doing", progress: 55, blocked: true },
+    { id: "T-413", title: "Roteiro do vídeo institucional — Cliché Café", project: "cc", assignees: ["cr","ts"], priority: "med", due: d(4), labels: ["Conteúdo","Vídeo"], checklist: [2,4], comments: 3, attachments: 0, est: 6, col: "doing", progress: 50 },
+    { id: "T-414", title: "PR #482 — Sistema de notificações in-app", project: "oi", assignees: ["ml","ps"], priority: "high", due: d(1), labels: ["Code review","Backend"], checklist: [6,6], comments: 8, attachments: 0, est: 10, col: "review", reviewer: "rm" },
+    { id: "T-415", title: "Revisão de copy — landing Volpe", project: "vc", assignees: ["cr"], priority: "med", due: d(2), labels: ["Copy","QA"], checklist: [1,3], comments: 2, attachments: 1, est: 2, col: "review", reviewer: "rm" },
+    { id: "T-416", title: "QA mobile iOS — Anima Pet build 1.4", project: "ap", assignees: ["ts"], priority: "high", due: d(0), labels: ["QA","Mobile"], checklist: [4,8], comments: 5, attachments: 4, est: 6, col: "review", reviewer: "ml" },
+    { id: "T-417", title: "Aprovação de identidade visual v3", project: "fa", assignees: ["jt"], priority: "med", due: d(4), labels: ["Cliente","Aprovação"], checklist: [0,1], comments: 3, attachments: 5, est: null, col: "client", waitingSince: 2 },
+    { id: "T-418", title: "Validação de estrutura de pricing", project: "vc", assignees: ["rm"], priority: "high", due: d(-3), labels: ["Cliente","Comercial"], checklist: [0,1], comments: 7, attachments: 2, est: null, col: "client", waitingSince: 6 },
+    { id: "T-419", title: "Conteúdo final blog — receber do cliente", project: "cc", assignees: ["cr"], priority: "low", due: d(3), labels: ["Cliente","Conteúdo"], checklist: [0,1], comments: 1, attachments: 0, est: null, col: "client", waitingSince: 1 },
+    { id: "T-420", title: "Deploy produção Nova Skin v2.1", project: "ns", assignees: ["ml"], priority: "high", due: d(-1), labels: ["Deploy"], checklist: [5,5], comments: 4, attachments: 1, est: 4, col: "done", completedAt: d(-1) },
+    { id: "T-421", title: "Onboarding cliente Olivetti — kickoff", project: "oi", assignees: ["ps","rm"], priority: "med", due: d(-2), labels: ["Reunião"], checklist: [3,3], comments: 2, attachments: 2, est: 2, col: "done", completedAt: d(-2) },
+    { id: "T-422", title: "Setup de tracking GA4 + Hotjar", project: "ns", assignees: ["ml"], priority: "med", due: d(-3), labels: ["Analytics"], checklist: [4,4], comments: 1, attachments: 0, est: 3, col: "done", completedAt: d(-3) },
+    { id: "T-423", title: "Newsletter Abril — disparada", project: null, assignees: ["cr","ts"], priority: "low", due: d(-4), labels: ["Marketing","Interno"], checklist: [6,6], comments: 0, attachments: 1, est: 4, col: "done", completedAt: d(-4) },
+  ];
+  return { TEAM, PROJECTS, COLUMNS, TASKS: T, TODAY };
+})();
+</script>
+
+<script type="text/babel">
+// tweaks panel (minimal)
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;background:rgba(250,249,247,.78);color:#29261b;-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);border:.5px solid rgba(255,255,255,.6);border-radius:14px;box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;min-height:0}
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-swatch{appearance:none;-webkit-appearance:none;width:56px;height:22px;border:.5px solid rgba(0,0,0,.1);border-radius:6px;padding:0;cursor:default;background:transparent;flex-shrink:0}
+  .twk-swatch::-webkit-color-swatch-wrapper{padding:0}
+  .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2}
+`;
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null ? keyOrEdits : { [keyOrEdits]: val };
+    setValues((prev) => ({ ...prev, ...edits }));
+  }, []);
+  return [values, setTweak];
+}
+function TweaksPanel({ title = 'Tweaks', children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+  React.useEffect(() => {
+    const onMsg = (e) => { const t = e?.data?.type; if (t === '__activate_edit_mode') setOpen(true); else if (t === '__deactivate_edit_mode') setOpen(false); };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+  if (!open) return null;
+  return (<><style>{__TWEAKS_STYLE}</style><div ref={dragRef} className="twk-panel" style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}><div className="twk-hd"><b>{title}</b><button className="twk-x" onClick={() => setOpen(false)}>✕</button></div><div className="twk-body">{children}</div></div></>);
+}
+function TweakSection({ label, title, children }) { return (<><div className="twk-sect">{title || label}</div>{children}</>); }
+function TweakRadio({ label, value, options, onChange }) {
+  const trackRef = React.useRef(null);
+  const opts = options.map((o) => (typeof o === 'object' ? o : { value: o, label: o }));
+  const idx = Math.max(0, opts.findIndex((o) => o.value === value));
+  const n = opts.length;
+  const valueRef = React.useRef(value); valueRef.current = value;
+  const segAt = (clientX) => { const r = trackRef.current.getBoundingClientRect(); const i = Math.floor(((clientX - r.left - 2) / (r.width - 4)) * n); return opts[Math.max(0, Math.min(n - 1, i))].value; };
+  const onPointerDown = (e) => { const v0 = segAt(e.clientX); if (v0 !== valueRef.current) onChange(v0); const move = (ev) => { if (!trackRef.current) return; const v = segAt(ev.clientX); if (v !== valueRef.current) onChange(v); }; const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); }; window.addEventListener('pointermove', move); window.addEventListener('pointerup', up); };
+  return (<div className="twk-row"><div className="twk-lbl"><span>{label}</span></div><div ref={trackRef} role="radiogroup" onPointerDown={onPointerDown} className="twk-seg"><div className="twk-seg-thumb" style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`, width: `calc((100% - 4px) / ${n})` }} />{opts.map((o) => (<button key={o.value} type="button" role="radio" aria-checked={o.value === value}>{o.label}</button>))}</div></div>);
+}
+function TweakColor({ label, value, onChange }) { return (<div className="twk-row twk-row-h"><div className="twk-lbl"><span>{label}</span></div><input type="color" className="twk-swatch" value={value} onChange={(e) => onChange(e.target.value)} /></div>); }
+Object.assign(window, { useTweaks, TweaksPanel, TweakSection, TweakRadio, TweakColor });
+</script>
+
+<script type="text/babel">
+// icons
+const Icon = {
+  Search: (p) => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>),
+  Menu: (p) => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" {...p}><path d="M4 7h16M4 12h16M4 17h10"/></svg>),
+  Bell: (p) => (<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>),
+  Mail: (p) => (<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>),
+  Plus: (p) => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" {...p}><path d="M12 5v14M5 12h14"/></svg>),
+  Home: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="m3 11 9-7 9 7v9a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z"/></svg>),
+  Users: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><circle cx="17" cy="9" r="2.5"/><path d="M19 17h3a4 4 0 0 0-4-4"/></svg>),
+  Sparkles: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="m12 3 1.8 4.5L18 9l-4.2 1.5L12 15l-1.8-4.5L6 9l4.2-1.5z"/><path d="M19 14v4M17 16h4M5 17v3M3.5 18.5h3"/></svg>),
+  Folder: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>),
+  Check: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m8 12 3 3 5-6"/></svg>),
+  Dollar: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 3v18M16 7H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6H7"/></svg>),
+  Chart: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 3v18h18"/><path d="m7 15 4-4 4 4 5-7"/></svg>),
+  Calendar: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>),
+  Settings: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>),
+  Megaphone: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 11v2a2 2 0 0 0 2 2h2l8 4V5L7 9H5a2 2 0 0 0-2 2z"/><path d="M19 8a4 4 0 0 1 0 8"/></svg>),
+  ArrowUp: (p) => (<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M7 14l5-5 5 5"/></svg>),
+  ArrowDown: (p) => (<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M7 10l5 5 5-5"/></svg>),
+  More: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" {...p}><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>),
+  Download: (p) => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 3v13m0 0-4-4m4 4 4-4M4 19h16"/></svg>),
+  Filter: (p) => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 5h18l-7 9v5l-4 2v-7z"/></svg>),
+};
+window.Icon = Icon;
+</script>
+
+<script type="text/babel">
+// Topbar (shared)
+const Topbar = ({ collapsed, setCollapsed }) => (
+  <header className="topbar">
+    <button className="topbar-toggle" onClick={() => setCollapsed(!collapsed)} aria-label="Toggle sidebar"><Icon.Menu /></button>
+    <div className="search"><Icon.Search /><input placeholder="Buscar tarefas, projetos..." /><kbd>⌘K</kbd></div>
+    <div className="topbar-spacer"></div>
+    <div className="topbar-actions">
+      <button className="icon-btn" aria-label="Mensagens"><Icon.Mail /><span className="dot"></span></button>
+      <button className="icon-btn" aria-label="Notificações"><Icon.Bell /><span className="dot"></span></button>
+      <button className="btn-primary"><Icon.Plus /> Novo lead</button>
+    </div>
+  </header>
+);
+
+// TasksSidebar
+const TasksSidebar = () => {
+  const nav = [
+    { section: "Principal", items: [
+      { icon: "Home", label: "Dashboard", href: "UPCOM Dashboard.html" },
+      { icon: "Users", label: "Clientes", badge: "47" },
+      { icon: "Sparkles", label: "Leads", badge: "12" },
+      { icon: "Folder", label: "Projetos", badge: "19" },
+      { icon: "Check", label: "Tarefas", badge: "87", active: true },
+    ]},
+    { section: "Operação", items: [
+      { icon: "Megaphone", label: "Campanhas" },
+      { icon: "Calendar", label: "Calendário" },
+      { icon: "Mail", label: "Mensagens", badge: "5" },
+      { icon: "Dollar", label: "Financeiro" },
+      { icon: "Chart", label: "Relatórios" },
+    ]},
+    { section: "Sistema", items: [
+      { icon: "Settings", label: "Configurações" },
+    ]},
+  ];
+  return (
+    <aside className="sidebar">
+      <div className="brand"><div className="brand-mark"></div><div className="brand-text">UP<em>COM</em></div></div>
+      <nav className="nav">
+        {nav.map((sec, i) => (
+          <div className="nav-section" key={i}>
+            <div className="nav-section-label">{sec.section}</div>
+            {sec.items.map((it, j) => {
+              const Ic = window.Icon[it.icon];
+              const Tag = it.href ? "a" : "div";
+              return (
+                <Tag href={it.href} className={"nav-item" + (it.active ? " active" : "")} key={j} style={{ textDecoration: "none" }}>
+                  <Ic /><span className="nav-label">{it.label}</span>
+                  {it.badge && <span className="nav-badge">{it.badge}</span>}
+                </Tag>
+              );
+            })}
+          </div>
+        ))}
+      </nav>
+      <div className="sidebar-footer">
+        <div className="avatar" style={{background: window.UPCOM_USER.color}}>{window.UPCOM_USER.initials}</div>
+        <div className="sidebar-footer-text"><div className="sidebar-footer-name">{window.UPCOM_USER.name}</div><div className="sidebar-footer-role">{window.UPCOM_USER.role}</div></div>
+        <button onClick={() => window.upcomLogout()} title="Sair" style={{marginLeft:"auto",background:"transparent",border:0,color:"var(--muted)",cursor:"pointer",padding:4,borderRadius:6,display:"grid",placeItems:"center",flexShrink:0}}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </aside>
+  );
+};
+window.TasksSidebar = TasksSidebar;
+window.Topbar = Topbar;
+</script>
+
+<script type="text/babel">
+// Kanban board components
+const D = window.UPCOM_TASKS;
+
+const dueState = (dueStr) => {
+  if (!dueStr) return { label: "—", state: "" };
+  const today = D.TODAY;
+  const due = new Date(dueStr);
+  const days = Math.floor((due - today) / 86400000);
+  const fmt = due.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }).replace(".", "");
+  if (days < 0) return { label: `${fmt} · ${Math.abs(days)}d atraso`, state: "overdue" };
+  if (days === 0) return { label: "Hoje", state: "due-today" };
+  if (days === 1) return { label: "Amanhã", state: "due-today" };
+  if (days <= 3) return { label: fmt, state: "due-today" };
+  return { label: fmt, state: "" };
+};
+
+const Avatar = ({ id, size = 22 }) => {
+  const m = D.TEAM.find(t => t.id === id);
+  if (!m) return null;
+  return (<div className="av-mini" style={{ background: m.color, width: size, height: size, fontSize: size * 0.4 }} title={m.name}>{m.initials}</div>);
+};
+
+const TaskCard = ({ task, onOpen, onDragStart, onDragEnd, dragging }) => {
+  const project = task.project ? D.PROJECTS.find(p => p.id === task.project) : null;
+  const due = dueState(task.due);
+  const isOverdue = due.state === "overdue" && task.col !== "done";
+  const checklistDone = task.checklist[0] === task.checklist[1] && task.checklist[1] > 0;
+  let className = "task-card priority-" + task.priority;
+  if (isOverdue) className += " overdue";
+  if (task.blocked) className += " blocked";
+  if (task.col === "done") className += " done";
+  if (dragging) className += " dragging";
+  const priLabel = { high: "Alta", med: "Média", low: "Baixa" }[task.priority];
+  return (
+    <div className={className} draggable onDragStart={(e) => onDragStart(task, e)} onDragEnd={onDragEnd} onClick={() => onOpen(task)}>
+      {task.blocked && <span className="task-flag blocked">Bloqueado</span>}
+      {task.col === "client" && task.waitingSince && <span className="task-flag waiting">{task.waitingSince}d esperando</span>}
+      <div className="task-top"><span className="task-id">{task.id}</span><span className={"task-priority priority-" + task.priority}>{priLabel}</span></div>
+      <div className="task-title">{task.title}</div>
+      {task.labels.length > 0 && (<div className="task-labels">{task.labels.map((l, i) => <span key={i} className="task-label">{l}</span>)}</div>)}
+      {project && (<div className="task-project"><span className="pdot" style={{ background: project.color }}></span>{project.name}</div>)}
+      {task.progress != null && (<div className="task-progress"><div style={{ width: task.progress + "%" }}></div></div>)}
+      <div className="task-meta">
+        <div className="task-meta-left">
+          <span className={"task-meta-item " + (checklistDone ? "checklist-done" : "")}><Icon.Check style={{width:12,height:12}} /> {task.checklist[0]}/{task.checklist[1]}</span>
+          {task.comments > 0 && (<span className="task-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L3 21l1.9-6.4A8 8 0 1 1 21 12z"/></svg>{task.comments}</span>)}
+          {task.attachments > 0 && (<span className="task-meta-item"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m21 11-9 9a5 5 0 0 1-7-7l9-9a3.5 3.5 0 0 1 5 5l-9 9a2 2 0 0 1-3-3l8-8"/></svg>{task.attachments}</span>)}
+          {task.due && (<span className={"task-meta-item " + due.state}><Icon.Calendar style={{width:12,height:12}} /> {due.label}</span>)}
+        </div>
+        <div className="task-assignees">{task.assignees.map(a => <Avatar key={a} id={a} />)}</div>
+      </div>
+    </div>
+  );
+};
+
+const Column = ({ col, tasks, onOpen, onDragStart, onDragEnd, draggingId, onDrop, dragOver, onDragEnter, onAdd }) => {
+  const wipOver = col.wip && tasks.length > col.wip;
+  return (
+    <div className={"column" + (dragOver ? " drag-over" : "")} onDragOver={(e) => { e.preventDefault(); }} onDragEnter={() => onDragEnter(col.id)} onDrop={() => onDrop(col.id)}>
+      <div className="col-header">
+        <div className="col-title"><span className={"col-dot " + col.id}></span>{col.name}<span className="col-count">{tasks.length}</span>{col.wip && <span className={"col-wip" + (wipOver ? " over" : "")}>WIP {tasks.length}/{col.wip}</span>}</div>
+        <div className="col-actions"><button className="icon-btn" title="Adicionar" onClick={onAdd}><Icon.Plus /></button><button className="icon-btn"><Icon.More /></button></div>
+      </div>
+      <div className="col-body">
+        {tasks.map(t => (<TaskCard key={t.id} task={t} onOpen={onOpen} onDragStart={onDragStart} onDragEnd={onDragEnd} dragging={draggingId === t.id} />))}
+        <button className="col-add" onClick={onAdd}><Icon.Plus /> Adicionar tarefa</button>
+      </div>
+    </div>
+  );
+};
+
+window.TaskCard = TaskCard;
+window.Column = Column;
+window.Avatar = Avatar;
+window.dueState = dueState;
+</script>
+
+<script type="text/babel">
+// Task Modal
+const TaskModal = ({ task, onClose }) => {
+  if (!task) return null;
+  const D = window.UPCOM_TASKS;
+  const project = task.project ? D.PROJECTS.find(p => p.id === task.project) : null;
+  const due = window.dueState(task.due);
+  const priLabel = { high: "Alta", med: "Média", low: "Baixa" }[task.priority];
+  const total = task.checklist[1];
+  const done = task.checklist[0];
+  const checklistItems = Array.from({ length: total }, (_, i) => ({
+    text: ["Levantar requisitos com o cliente","Mapear referências e benchmarks","Esboçar primeira proposta","Validar com líder técnico","Refinar com base no feedback","Apresentar para aprovação","Implementar versão final","Documentar entrega","Publicar e comunicar"][i] || `Subtarefa ${i + 1}`,
+    done: i < done,
+  }));
+  const comments = [
+    { who: "ml", at: "há 2h", text: "Subi a primeira versão pra homologação. Falta ajustar o estado de erro do form." },
+    { who: "jt", at: "há 1h", text: "Vi aqui — manda ver. Vou revisar o spacing dos cards no mobile também." },
+    { who: "rm", at: "há 22 min", text: "Show. Lembrando: a apresentação pro cliente é quinta de manhã, então precisamos fechar até quarta à noite." },
+  ];
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <div className="modal-title-block">
+            <div className="modal-id-row">
+              <span style={{ fontFamily: "var(--font-mono)" }}>{task.id}</span><span>·</span>
+              {project && (<><span style={{ display:"inline-flex",alignItems:"center",gap:5 }}><span style={{ width:8,height:8,borderRadius:2,background:project.color,display:"inline-block" }}></span>{project.name}</span><span>·</span></>)}
+              <span className={"task-priority priority-" + task.priority}>{priLabel}</span>
+            </div>
+            <h2 className="modal-title">{task.title}</h2>
+          </div>
+          <button className="icon-btn" onClick={onClose} aria-label="Fechar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M6 18 18 6"/></svg></button>
+        </div>
+        <div className="modal-body">
+          <div className="modal-main">
+            <div>
+              <h4 className="modal-section-title">Descrição</h4>
+              <p className="modal-desc">Implementação dos componentes com as definições acordadas com o cliente. Inclui o fluxo completo, integrações necessárias e validações de negócio. Prazo alinhado com a apresentação desta semana.</p>
+            </div>
+            <div>
+              <h4 className="modal-section-title">Checklist · {done}/{total}</h4>
+              <div className="checklist-progress"><div style={{ width: (done / Math.max(total,1)) * 100 + "%" }}></div></div>
+              {checklistItems.map((item, i) => (<label className={"checklist-item" + (item.done ? " done" : "")} key={i}><input type="checkbox" defaultChecked={item.done} onClick={(e) => e.stopPropagation()} />{item.text}</label>))}
+            </div>
+            <div>
+              <h4 className="modal-section-title">Comentários · {comments.length}</h4>
+              {comments.map((c, i) => {
+                const m = D.TEAM.find(t => t.id === c.who);
+                return (<div className="comment" key={i}><div className="av-mini" style={{ background: m.color, width:26,height:26,fontSize:10,borderRadius:"50%",display:"grid",placeItems:"center",color:"#fff",fontWeight:700,flexShrink:0 }}>{m.initials}</div><div className="comment-body"><div className="comment-meta"><strong>{m.name}</strong> · {c.at}</div><div>{c.text}</div></div></div>);
+              })}
+              <div className="comment-input">
+                <div className="av-mini" style={{ background:"#E85D44",width:26,height:26,fontSize:10,borderRadius:"50%",display:"grid",placeItems:"center",color:"#fff",fontWeight:700,flexShrink:0 }}>RM</div>
+                <textarea placeholder="Escrever um comentário..." />
+              </div>
+            </div>
+          </div>
+          <div className="modal-sidebar">
+            <div><div className="modal-side-label">Status</div><div className="modal-side-value"><span className={"col-dot " + task.col} style={{width:8,height:8,borderRadius:"50%"}}></span>{D.COLUMNS.find(c => c.id === task.col).name}</div></div>
+            <div><div className="modal-side-label">Responsáveis</div><div className="modal-side-value" style={{flexWrap:"wrap"}}>{task.assignees.map(a => { const m = D.TEAM.find(t => t.id === a); return (<span key={a} style={{display:"inline-flex",alignItems:"center",gap:5}}><span className="av-mini" style={{background:m.color,width:20,height:20,fontSize:9,borderRadius:"50%",display:"inline-grid",placeItems:"center",color:"#fff",fontWeight:700}}>{m.initials}</span>{m.name.split(" ")[0]}</span>); })}</div></div>
+            <div><div className="modal-side-label">Prazo</div><div className="modal-side-value"><Icon.Calendar style={{width:13,height:13}} /><span className={due.state==="overdue"?"task-meta-item overdue":""}>{due.label}</span></div></div>
+            <div><div className="modal-side-label">Prioridade</div><div className="modal-side-value"><span className={"task-priority priority-" + task.priority}>{priLabel}</span></div></div>
+            <div><div className="modal-side-label">Estimativa</div><div className="modal-side-value"><span style={{fontFamily:"var(--font-mono)"}}>{task.est ? task.est + "h" : "—"}</span></div></div>
+            <div><div className="modal-side-label">Labels</div><div className="modal-side-value" style={{flexWrap:"wrap",gap:4}}>{task.labels.map((l, i) => <span key={i} className="task-label">{l}</span>)}</div></div>
+            <div><div className="modal-side-label">Anexos</div><div className="modal-side-value">{task.attachments} arquivo{task.attachments === 1 ? "" : "s"}</div></div>
+            <div style={{marginTop:"auto",display:"flex",flexDirection:"column",gap:6}}>
+              <button className="btn-primary" style={{justifyContent:"center"}}>Marcar como concluída</button>
+              <button className="btn-secondary" style={{justifyContent:"center"}}>Duplicar tarefa</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+window.TaskModal = TaskModal;
+</script>
+
+<script type="text/babel">
+// New Task Modal
+const NewTaskModal = ({ defaultCol, onClose, onSave }) => {
+  const D = window.UPCOM_TASKS;
+  const [title, setTitle] = React.useState("");
+  const [col, setCol] = React.useState(defaultCol);
+  const [project, setProject] = React.useState("");
+  const [priority, setPriority] = React.useState("med");
+  const [assignees, setAssignees] = React.useState([]);
+  const [due, setDue] = React.useState("");
+  const [est, setEst] = React.useState("");
+  const [labelInput, setLabelInput] = React.useState("");
+  const [labels, setLabels] = React.useState([]);
+
+  const toggleAssignee = (id) => setAssignees(prev => prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]);
+
+  const addLabel = (e) => {
+    if (e.key === "Enter" && labelInput.trim()) {
+      e.preventDefault();
+      const val = labelInput.trim();
+      if (!labels.includes(val)) setLabels(prev => [...prev, val]);
+      setLabelInput("");
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!title.trim()) return;
+    onSave({ title: title.trim(), col, project: project || null, priority, assignees, due: due || null, labels, est: est ? parseInt(est) : null, checklist: [0, 0], comments: 0, attachments: 0 });
+    onClose();
+  };
+
+  const fStyle = { width:"100%", padding:"8px 12px", border:"1px solid var(--border)", borderRadius:"var(--r-sm)", fontSize:13, fontFamily:"inherit", outline:"none", background:"var(--surface-2)", color:"var(--ink)", transition:"border-color 120ms" };
+  const lStyle = { fontSize:11, fontWeight:600, textTransform:"uppercase", letterSpacing:"0.06em", color:"var(--muted)", display:"block", marginBottom:6 };
+
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal" style={{maxWidth:520}} onClick={e => e.stopPropagation()}>
+        <div className="modal-header">
+          <div className="modal-title-block"><h2 className="modal-title">Nova tarefa</h2></div>
+          <button className="icon-btn" onClick={onClose} aria-label="Fechar"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M6 18 18 6"/></svg></button>
+        </div>
+        <form onSubmit={handleSubmit}>
+          <div style={{padding:"16px 22px 4px", display:"flex", flexDirection:"column", gap:14, overflowY:"auto", maxHeight:"calc(85vh - 130px)"}}>
+
+            <div>
+              <label style={lStyle}>Título *</label>
+              <input autoFocus value={title} onChange={e => setTitle(e.target.value)} placeholder="Descreva a tarefa..." style={fStyle} onFocus={e => e.target.style.borderColor="var(--upcom-coral)"} onBlur={e => e.target.style.borderColor="var(--border)"} />
+            </div>
+
+            <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:12}}>
+              <div>
+                <label style={lStyle}>Status</label>
+                <select value={col} onChange={e => setCol(e.target.value)} style={{...fStyle, appearance:"none"}}>
+                  {D.COLUMNS.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={lStyle}>Prioridade</label>
+                <div style={{display:"flex", gap:6}}>
+                  {[["high","Alta"],["med","Média"],["low","Baixa"]].map(([v,l]) => (
+                    <button key={v} type="button" onClick={() => setPriority(v)}
+                      className={"task-priority priority-"+v}
+                      style={{border: priority===v ? "2px solid currentColor" : "1.5px solid var(--border)", cursor:"pointer", padding:"5px 8px", borderRadius:"var(--r-sm)", fontSize:11}}>
+                      {l}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label style={lStyle}>Projeto</label>
+              <select value={project} onChange={e => setProject(e.target.value)} style={{...fStyle, appearance:"none"}}>
+                <option value="">Sem projeto</option>
+                {D.PROJECTS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </select>
+            </div>
+
+            <div>
+              <label style={lStyle}>Responsáveis</label>
+              <div style={{display:"flex", gap:8, flexWrap:"wrap"}}>
+                {D.TEAM.map(m => (
+                  <button key={m.id} type="button" onClick={() => toggleAssignee(m.id)} title={m.name}
+                    style={{width:34, height:34, borderRadius:"50%", border: assignees.includes(m.id) ? "2.5px solid var(--upcom-coral)" : "2px solid transparent",
+                      background:m.color, color:"#fff", fontWeight:700, fontSize:11, cursor:"pointer",
+                      opacity: assignees.length===0 || assignees.includes(m.id) ? 1 : 0.4,
+                      fontFamily:"var(--font-display)", transition:"opacity 120ms"}}>
+                    {m.initials}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap:12}}>
+              <div>
+                <label style={lStyle}>Prazo</label>
+                <input type="date" value={due} onChange={e => setDue(e.target.value)} style={fStyle} onFocus={e => e.target.style.borderColor="var(--upcom-coral)"} onBlur={e => e.target.style.borderColor="var(--border)"} />
+              </div>
+              <div>
+                <label style={lStyle}>Estimativa (horas)</label>
+                <input type="number" min="0" value={est} onChange={e => setEst(e.target.value)} placeholder="Ex: 4" style={fStyle} onFocus={e => e.target.style.borderColor="var(--upcom-coral)"} onBlur={e => e.target.style.borderColor="var(--border)"} />
+              </div>
+            </div>
+
+            <div style={{paddingBottom:8}}>
+              <label style={lStyle}>Labels <span style={{fontWeight:400, textTransform:"none", letterSpacing:0, fontSize:10}}> · Enter para adicionar</span></label>
+              {labels.length > 0 && (
+                <div style={{display:"flex", flexWrap:"wrap", gap:4, marginBottom:8}}>
+                  {labels.map(l => (
+                    <span key={l} className="task-label" style={{cursor:"pointer", display:"inline-flex", alignItems:"center", gap:4}} onClick={() => setLabels(labels.filter(x => x !== l))}>
+                      {l} <span style={{fontSize:10, fontWeight:900, lineHeight:1}}>×</span>
+                    </span>
+                  ))}
+                </div>
+              )}
+              <input value={labelInput} onChange={e => setLabelInput(e.target.value)} onKeyDown={addLabel} placeholder="Ex: Frontend, Design…" style={fStyle} onFocus={e => e.target.style.borderColor="var(--upcom-coral)"} onBlur={e => e.target.style.borderColor="var(--border)"} />
+            </div>
+          </div>
+
+          <div style={{padding:"12px 22px 18px", display:"flex", justifyContent:"flex-end", gap:8, borderTop:"1px solid var(--border)"}}>
+            <button type="button" className="btn-secondary" onClick={onClose}>Cancelar</button>
+            <button type="submit" className="btn-primary" style={{opacity: title.trim() ? 1 : 0.5, pointerEvents: title.trim() ? "auto" : "none"}}>
+              <Icon.Plus /> Criar tarefa
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+window.NewTaskModal = NewTaskModal;
+</script>
+
+<script type="text/babel">
+// Main tasks app
+const TASKS_TWEAK_DEFAULTS = { "primaryColor": "#E85D44", "theme": "light" };
+
+const TasksApp = () => {
+  const D = window.UPCOM_TASKS;
+  const [tweaks, setTweak] = window.useTweaks(TASKS_TWEAK_DEFAULTS);
+  const [collapsed, setCollapsed] = React.useState(false);
+  const [tasks, setTasks] = React.useState(D.TASKS);
+  const [view, setView] = React.useState("kanban");
+  const [openTask, setOpenTask] = React.useState(null);
+  const [search, setSearch] = React.useState("");
+  const [filterAssignees, setFilterAssignees] = React.useState([]);
+  const [filterPriority, setFilterPriority] = React.useState(null);
+  const [filterProject, setFilterProject] = React.useState(null);
+  const [draggingId, setDraggingId] = React.useState(null);
+  const [dragOverCol, setDragOverCol] = React.useState(null);
+  const [newTaskCol, setNewTaskCol] = React.useState(null);
+
+  React.useEffect(() => {
+    document.documentElement.style.setProperty("--upcom-coral", tweaks.primaryColor);
+    document.documentElement.setAttribute("data-theme", tweaks.theme);
+  }, [tweaks.primaryColor, tweaks.theme]);
+
+  const filtered = tasks.filter(t => {
+    if (search && !t.title.toLowerCase().includes(search.toLowerCase()) && !t.id.toLowerCase().includes(search.toLowerCase())) return false;
+    if (filterAssignees.length > 0 && !t.assignees.some(a => filterAssignees.includes(a))) return false;
+    if (filterPriority && t.priority !== filterPriority) return false;
+    if (filterProject && t.project !== filterProject) return false;
+    return true;
+  });
+
+  const tasksByCol = (colId) => filtered.filter(t => t.col === colId);
+
+  const onDragStart = (task, e) => { setDraggingId(task.id); e.dataTransfer.effectAllowed = "move"; };
+  const onDragEnd = () => { setDraggingId(null); setDragOverCol(null); };
+  const onDrop = (colId) => { if (draggingId) { setTasks(tasks.map(t => t.id === draggingId ? { ...t, col: colId } : t)); } setDraggingId(null); setDragOverCol(null); };
+
+  const handleCreateTask = (taskData) => {
+    const maxId = Math.max(...tasks.map(t => parseInt(t.id.replace("T-","")) || 0), 400);
+    setTasks(prev => [...prev, { ...taskData, id: "T-" + (maxId + 1) }]);
+  };
+
+  const totalForProgress = tasks.filter(t => t.col !== "backlog").length;
+  const doneCount = tasks.filter(t => t.col === "done").length;
+  const reviewCount = tasks.filter(t => t.col === "review" || t.col === "client").length;
+  const doingCount = tasks.filter(t => t.col === "doing").length;
+  const overdueCount = tasks.filter(t => { if (t.col === "done" || !t.due) return false; return window.dueState(t.due).state === "overdue"; }).length;
+
+  const toggleAssignee = (id) => setFilterAssignees(filterAssignees.includes(id) ? filterAssignees.filter(a => a !== id) : [...filterAssignees, id]);
+
+  return (
+    <>
+      <div className={"app" + (collapsed ? " collapsed" : "")}>
+        <TasksSidebar />
+        <div className="main">
+          <Topbar collapsed={collapsed} setCollapsed={setCollapsed} />
+          <div className="content">
+            <div className="page-header">
+              <div className="page-title-block">
+                <h1 className="page-title">Tarefas</h1>
+                <div className="page-subtitle">Sprint <strong>#21</strong> · 28 abr — 11 mai · <strong>{filtered.length}</strong> tarefas{overdueCount > 0 && <> · <strong style={{color:"var(--danger)"}}>{overdueCount} atrasadas</strong></>}</div>
+              </div>
+              <div className="filters">
+                <div className="view-switch">
+                  <button className={view==="kanban"?"active":""} onClick={()=>setView("kanban")}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="6" height="16" rx="1"/><rect x="11" y="4" width="6" height="10" rx="1"/><rect x="19" y="4" width="2" height="6" rx="1"/></svg>Kanban</button>
+                  <button className={view==="list"?"active":""} onClick={()=>setView("list")}><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Lista</button>
+                  <button className={view==="cal"?"active":""} onClick={()=>setView("cal")}><Icon.Calendar />Calendário</button>
+                </div>
+                <button className="btn-secondary"><Icon.Download /> Exportar</button>
+                <button className="btn-primary" onClick={() => setNewTaskCol("todo")}><Icon.Plus /> Nova tarefa</button>
+              </div>
+            </div>
+
+            <div className="sprint-bar">
+              <div className="sprint-info"><div className="sprint-name">Sprint 21 — Foco: Anima Pet & Nova Skin<span className="pill">11 dias restantes</span></div><div className="sprint-meta">Iniciado em 28 abr · término previsto 11 mai · 6 pessoas</div></div>
+              <div className="sprint-progress">
+                <div className="sprint-progress-track">
+                  <div className="seg-done" style={{width:(doneCount/totalForProgress*100)+"%"}}></div>
+                  <div className="seg-review" style={{width:(reviewCount/totalForProgress*100)+"%"}}></div>
+                  <div className="seg-doing" style={{width:(doingCount/totalForProgress*100)+"%"}}></div>
+                </div>
+                <div className="sprint-progress-numbers"><span><strong>{doneCount}</strong> concluídas</span><span><strong>{reviewCount}</strong> revisão</span><span><strong>{doingCount}</strong> ativas</span><span>de <strong>{totalForProgress}</strong></span></div>
+              </div>
+              <div className="sprint-team">
+                <div className="sprint-team-label">Time ativo</div>
+                <div style={{display:"flex"}}>{D.TEAM.map(m => (<div key={m.id} className="av-mini" style={{background:m.color,width:30,height:30,fontSize:11,borderRadius:"50%",display:"grid",placeItems:"center",color:"#fff",fontWeight:700,border:"2px solid var(--surface)",marginLeft:-7,fontFamily:"var(--font-display)"}} title={m.name}>{m.initials}</div>))}</div>
+              </div>
+            </div>
+
+            <div className="tasks-toolbar">
+              <div className="search" style={{maxWidth:280}}>
+                <Icon.Search /><input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Buscar tarefas..." />
+              </div>
+              <div className="assignee-filters">
+                {D.TEAM.map(m => (<button key={m.id} className={"assignee-chip" + (filterAssignees.includes(m.id) ? " active" : "")} onClick={()=>toggleAssignee(m.id)} title={m.name}><span className="av" style={{background:m.color,opacity:filterAssignees.length===0||filterAssignees.includes(m.id)?1:0.4}}>{m.initials}</span></button>))}
+              </div>
+              <button className={"filter-chip" + (filterPriority==="high"?" active":"")} onClick={()=>setFilterPriority(filterPriority==="high"?null:"high")}><span className="col-dot" style={{background:"var(--danger)"}}></span>Alta prioridade</button>
+              <select className="filter-chip" style={{appearance:"none",paddingRight:24}} value={filterProject||""} onChange={(e)=>setFilterProject(e.target.value||null)}>
+                <option value="">Todos os projetos</option>
+                {D.PROJECTS.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+              </select>
+              <button className="filter-chip"><Icon.Filter /> Mais filtros</button>
+              {(filterAssignees.length>0||filterPriority||filterProject||search) && (<button className="filter-chip" onClick={()=>{setFilterAssignees([]);setFilterPriority(null);setFilterProject(null);setSearch("");}} style={{color:"var(--upcom-coral)"}}>Limpar filtros</button>)}
+              <div className="spacer"></div>
+              <span style={{fontSize:11,color:"var(--muted)"}}>{filtered.length} de {tasks.length} tarefas</span>
+            </div>
+
+            {view === "kanban" && (
+              <div className="board-wrap">
+                <div className="board">
+                  {D.COLUMNS.map(col => (<Column key={col.id} col={col} tasks={tasksByCol(col.id)} onOpen={setOpenTask} onDragStart={onDragStart} onDragEnd={onDragEnd} draggingId={draggingId} onDrop={onDrop} dragOver={dragOverCol===col.id} onDragEnter={(id)=>setDragOverCol(id)} onAdd={() => setNewTaskCol(col.id)} />))}
+                </div>
+              </div>
+            )}
+
+            {view === "list" && (
+              <div className="card">
+                <div className="table-wrap">
+                  <table className="data">
+                    <thead><tr><th style={{paddingLeft:18,width:60}}>ID</th><th>Tarefa</th><th>Projeto</th><th>Status</th><th>Prioridade</th><th>Resp.</th><th>Prazo</th><th style={{paddingRight:18}}>Check.</th></tr></thead>
+                    <tbody>
+                      {filtered.map(t => {
+                        const p = t.project ? D.PROJECTS.find(x=>x.id===t.project) : null;
+                        const due = window.dueState(t.due);
+                        const col = D.COLUMNS.find(c=>c.id===t.col);
+                        return (
+                          <tr key={t.id} onClick={()=>setOpenTask(t)}>
+                            <td style={{paddingLeft:18,fontFamily:"var(--font-mono)",fontSize:11,color:"var(--muted)"}}>{t.id}</td>
+                            <td style={{fontWeight:600,color:"var(--ink)"}}>{t.title}</td>
+                            <td>{p ? <span style={{display:"inline-flex",alignItems:"center",gap:6}}><span style={{width:8,height:8,borderRadius:2,background:p.color}}></span>{p.name}</span> : <span style={{color:"var(--muted)"}}>—</span>}</td>
+                            <td><span style={{display:"inline-flex",alignItems:"center",gap:6,fontSize:12}}><span className={"col-dot "+t.col}></span>{col.name}</span></td>
+                            <td><span className={"task-priority priority-"+t.priority}>{{high:"Alta",med:"Média",low:"Baixa"}[t.priority]}</span></td>
+                            <td><div className="task-assignees">{t.assignees.map(a=><Avatar key={a} id={a} size={24} />)}</div></td>
+                            <td><span className={"deadline-cell "+(due.state==="overdue"?"late":due.state==="due-today"?"soon":"")}>{due.label}</span></td>
+                            <td style={{paddingRight:18,fontFamily:"var(--font-mono)",fontSize:11}}>{t.checklist[0]}/{t.checklist[1]}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {view === "cal" && (
+              <div className="card" style={{padding:60,textAlign:"center"}}>
+                <Icon.Calendar style={{width:40,height:40,color:"var(--muted-2)"}} />
+                <h3 style={{marginTop:12,fontFamily:"var(--font-display)"}}>Visão de calendário</h3>
+                <p style={{color:"var(--muted)",fontSize:13}}>Em breve — em desenvolvimento</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {openTask && <TaskModal task={openTask} onClose={()=>setOpenTask(null)} />}
+      {newTaskCol !== null && <NewTaskModal defaultCol={newTaskCol} onClose={() => setNewTaskCol(null)} onSave={handleCreateTask} />}
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Marca"><TweakColor label="Cor primária" value={tweaks.primaryColor} onChange={v => setTweak("primaryColor", v)} /></TweakSection>
+        <TweakSection title="Aparência"><TweakRadio label="Tema" value={tweaks.theme} onChange={v => setTweak("theme", v)} options={[{value:"light",label:"Claro"},{value:"dark",label:"Escuro"}]} /></TweakSection>
+        <TweakSection title="Cores rápidas">
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            {[["#E85D44","Coral"],["#0E0E0E","Preto"],["#2C6BB8","Azul"],["#2F8F5F","Verde"],["#9333EA","Roxo"],["#C77A1B","Âmbar"]].map(([c,n]) => (
+              <button key={c} onClick={()=>setTweak("primaryColor",c)} title={n} style={{width:32,height:32,borderRadius:8,background:c,border:tweaks.primaryColor===c?"2px solid var(--ink)":"1px solid var(--border)",cursor:"pointer",padding:0}} />
+            ))}
+          </div>
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(<TasksApp />);
+</script>
+</body>
+</html>

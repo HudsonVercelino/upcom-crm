@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UPCOM · CRM Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+/* UPCOM Digital — CRM Dashboard */
+:root {
+  --upcom-coral: #E85D44;
+  --upcom-coral-dark: #C94A33;
+  --upcom-coral-light: #FFE4DD;
+  --upcom-coral-50: #FFF5F2;
+  --bg: #F7F5F2;
+  --surface: #FFFFFF;
+  --surface-2: #FAF8F5;
+  --border: #ECE7E0;
+  --border-strong: #D9D2C8;
+  --ink: #0E0E0E;
+  --ink-2: #2A2A2A;
+  --muted: #6B6760;
+  --muted-2: #9B9690;
+  --success: #2F8F5F;
+  --success-bg: #E5F3EC;
+  --warn: #C77A1B;
+  --warn-bg: #FBF0DD;
+  --danger: #C2392E;
+  --danger-bg: #FBE5E2;
+  --info: #2C6BB8;
+  --info-bg: #E2EDF9;
+  --font-sans: "Inter Tight", "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: "Bricolage Grotesque", "Inter Tight", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --r-xs: 4px; --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px;
+  --shadow-sm: 0 1px 2px rgba(14,14,14,0.04),0 1px 1px rgba(14,14,14,0.02);
+  --shadow-md: 0 4px 12px rgba(14,14,14,0.06),0 1px 2px rgba(14,14,14,0.04);
+  --shadow-lg: 0 12px 32px rgba(14,14,14,0.08),0 2px 4px rgba(14,14,14,0.04);
+  --sidebar-w: 232px;
+  --sidebar-w-collapsed: 64px;
+  --topbar-h: 56px;
+}
+[data-theme="dark"] {
+  --bg: #0E0D0C; --surface: #1A1916; --surface-2: #15140F;
+  --border: #2A2823; --border-strong: #3A372F;
+  --ink: #F5F1EB; --ink-2: #E5DFD5; --muted: #9B9690; --muted-2: #6B6760;
+  --upcom-coral-light: #3A1E16; --upcom-coral-50: #221310;
+  --success-bg: #142A1F; --warn-bg: #2A1F0C; --danger-bg: #2A1410; --info-bg: #0E1F33;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.35);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+}
+* { box-sizing: border-box; }
+html,body { margin:0;padding:0;font-family:var(--font-sans);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-feature-settings:"ss01","cv11"; }
+button { font-family:inherit;cursor:pointer; }
+.app { display:grid;grid-template-columns:var(--sidebar-w) 1fr;min-height:100vh;transition:grid-template-columns 240ms cubic-bezier(.2,.7,.2,1); }
+.app.collapsed { grid-template-columns:var(--sidebar-w-collapsed) 1fr; }
+.sidebar { background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow:hidden; }
+.brand { display:flex;align-items:center;gap:10px;padding:16px 18px;border-bottom:1px solid var(--border);height:var(--topbar-h);flex-shrink:0; }
+.brand-mark { width:28px;height:28px;background:var(--upcom-coral);border-radius:7px;display:grid;place-items:center;flex-shrink:0;position:relative; }
+.brand-mark::after { content:"";width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:9px solid #fff;transform:translateY(-1px); }
+.brand-text { font-family:var(--font-display);font-weight:800;font-size:17px;letter-spacing:-0.02em;color:var(--ink);white-space:nowrap; }
+.brand-text em { font-style:normal;color:var(--upcom-coral);font-weight:800; }
+.collapsed .brand-text,.collapsed .nav-label,.collapsed .nav-section-label,.collapsed .sidebar-footer-text { display:none; }
+.collapsed .nav-item { justify-content:center; }
+.nav { flex:1;overflow-y:auto;padding:12px 10px; }
+.nav-section { margin-bottom:18px; }
+.nav-section-label { font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted-2);padding:6px 12px 8px; }
+.nav-item { display:flex;align-items:center;gap:11px;padding:8px 12px;border-radius:var(--r-sm);color:var(--ink-2);cursor:pointer;font-size:13.5px;font-weight:500;margin-bottom:1px;position:relative;white-space:nowrap;transition:background 120ms; }
+.nav-item:hover { background:var(--surface-2); }
+.nav-item.active { background:var(--upcom-coral-50);color:var(--upcom-coral); }
+.nav-item.active::before { content:"";position:absolute;left:-10px;top:8px;bottom:8px;width:3px;background:var(--upcom-coral);border-radius:0 3px 3px 0; }
+.nav-item svg { flex-shrink:0; }
+.nav-badge { margin-left:auto;background:var(--upcom-coral);color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;min-width:18px;text-align:center; }
+.nav-item:not(.active) .nav-badge { background:var(--border-strong);color:var(--ink-2); }
+.sidebar-footer { padding:12px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px; }
+.avatar { width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--upcom-coral) 0%,var(--upcom-coral-dark) 100%);color:#fff;font-weight:700;font-size:12px;display:grid;place-items:center;flex-shrink:0; }
+.sidebar-footer-text { line-height:1.2; }
+.sidebar-footer-name { font-size:13px;font-weight:600;color:var(--ink); }
+.sidebar-footer-role { font-size:11px;color:var(--muted); }
+.main { display:flex;flex-direction:column;min-width:0; }
+.topbar { height:var(--topbar-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;position:sticky;top:0;z-index:10; }
+.topbar-toggle { background:transparent;border:0;color:var(--ink);padding:6px;border-radius:var(--r-sm);display:grid;place-items:center; }
+.topbar-toggle:hover { background:var(--surface-2); }
+.search { flex:1;max-width:420px;position:relative; }
+.search input { width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-sm);padding:7px 12px 7px 34px;font-size:13px;color:var(--ink);font-family:inherit;outline:none;transition:border-color 120ms,background 120ms; }
+.search input:focus { border-color:var(--upcom-coral);background:var(--surface); }
+.search input::placeholder { color:var(--muted-2); }
+.search svg { position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted); }
+.search kbd { position:absolute;right:10px;top:50%;transform:translateY(-50%);font-family:var(--font-mono);font-size:10px;background:var(--surface);border:1px solid var(--border);padding:1px 5px;border-radius:3px;color:var(--muted); }
+.topbar-spacer { flex:1; }
+.topbar-actions { display:flex;align-items:center;gap:6px; }
+.icon-btn { background:transparent;border:0;width:34px;height:34px;border-radius:var(--r-sm);display:grid;place-items:center;color:var(--ink-2);position:relative; }
+.icon-btn:hover { background:var(--surface-2); }
+.icon-btn .dot { position:absolute;top:8px;right:8px;width:7px;height:7px;background:var(--upcom-coral);border-radius:50%;border:2px solid var(--surface); }
+.btn-primary { background:var(--upcom-coral);color:#fff;border:0;padding:8px 14px;border-radius:var(--r-sm);font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:6px;transition:background 120ms; }
+.btn-primary:hover { background:var(--upcom-coral-dark); }
+.btn-secondary { background:var(--surface);color:var(--ink);border:1px solid var(--border-strong);padding:7px 12px;border-radius:var(--r-sm);font-weight:500;font-size:13px;display:inline-flex;align-items:center;gap:6px; }
+.btn-secondary:hover { background:var(--surface-2); }
+.content { padding:24px;display:flex;flex-direction:column;gap:16px;max-width:1600px;width:100%;margin:0 auto; }
+.page-header { display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap; }
+.page-title-block { display:flex;flex-direction:column;gap:4px; }
+.page-title { font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-0.02em;color:var(--ink);margin:0;line-height:1.1; }
+.page-subtitle { color:var(--muted);font-size:13.5px; }
+.page-subtitle strong { color:var(--ink-2);font-weight:600; }
+.filters { display:flex;gap:8px;align-items:center;flex-wrap:wrap; }
+.segmented { display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:2px; }
+.segmented button { background:transparent;border:0;padding:5px 12px;font-size:12.5px;font-weight:500;color:var(--muted);border-radius:4px;transition:all 120ms; }
+.segmented button.active { background:var(--ink);color:var(--bg); }
+[data-theme="dark"] .segmented button.active { background:var(--upcom-coral);color:#fff; }
+.kpi-row { display:grid;grid-template-columns:repeat(7,1fr);gap:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm); }
+.kpi { padding:16px 18px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:8px;position:relative;transition:background 120ms;cursor:pointer; }
+.kpi:last-child { border-right:0; }
+.kpi:hover { background:var(--surface-2); }
+.kpi-label { font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:6px; }
+.kpi-value { font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:-0.02em;color:var(--ink);line-height:1; }
+.kpi-value .currency { font-size:14px;color:var(--muted);margin-right:2px;font-weight:500; }
+.kpi-trend { display:flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600; }
+.kpi-trend.up { color:var(--success); }
+.kpi-trend.down { color:var(--danger); }
+.kpi-trend .vs { color:var(--muted);font-weight:500;margin-left:2px; }
+.kpi-spark { position:absolute;bottom:8px;right:10px;opacity:0.6; }
+.kpi.featured { background:var(--ink);color:var(--bg); }
+.kpi.featured .kpi-label,.kpi.featured .kpi-value { color:#FFFFFF; }
+.kpi.featured .kpi-label { color:rgba(255,255,255,0.6); }
+.kpi.featured:hover { background:var(--ink-2); }
+.grid-3 { display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:16px; }
+.grid-2 { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+.card { background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;overflow:hidden; }
+.card-header { padding:16px 18px 10px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px; }
+.card-title-block { display:flex;flex-direction:column;gap:2px; }
+.card-title { font-family:var(--font-display);font-size:16px;font-weight:700;letter-spacing:-0.01em;color:var(--ink);margin:0; }
+.card-subtitle { font-size:12px;color:var(--muted); }
+.card-actions { display:flex;gap:4px;align-items:center; }
+.tab-pill { background:transparent;border:0;padding:4px 10px;font-size:12px;font-weight:500;color:var(--muted);border-radius:999px; }
+.tab-pill.active { background:var(--upcom-coral-50);color:var(--upcom-coral);font-weight:600; }
+.card-body { padding:0 18px 18px;flex:1; }
+.card-footer { padding:10px 18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted); }
+.card-footer a { color:var(--upcom-coral);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px; }
+.revenue-stats { display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding:8px 0 16px;border-bottom:1px solid var(--border);margin-bottom:12px; }
+.revenue-stat-label { font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);font-weight:600;margin-bottom:4px; }
+.revenue-stat-value { font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:-0.02em;color:var(--ink); }
+.revenue-stat-meta { font-size:11.5px;color:var(--muted);margin-top:2px; }
+.revenue-stat-meta .pos { color:var(--success);font-weight:600; }
+.chart-wrap { position:relative;height:240px;width:100%; }
+.chart-legend { display:flex;gap:14px;font-size:11.5px;color:var(--muted);margin-bottom:4px; }
+.chart-legend .dot { display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:-1px; }
+.funnel { display:flex;flex-direction:column;gap:8px;padding-top:4px; }
+.funnel-row { position:relative;cursor:pointer;transition:transform 120ms; }
+.funnel-row:hover { transform:translateX(2px); }
+.funnel-bar { background:var(--upcom-coral);color:#fff;border-radius:var(--r-sm);padding:10px 14px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden; }
+.funnel-bar::after { content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,0.08) 0%,transparent 50%);pointer-events:none; }
+.funnel-stage { font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:8px; }
+.funnel-stage .num { font-family:var(--font-mono);font-size:10px;background:rgba(255,255,255,0.18);padding:1px 5px;border-radius:3px; }
+.funnel-count { font-family:var(--font-display);font-size:16px;font-weight:700;letter-spacing:-0.01em; }
+.funnel-meta { display:flex;justify-content:space-between;padding:0 4px;font-size:11px;color:var(--muted);margin-top:2px; }
+.funnel-meta .conv { color:var(--success);font-weight:600; }
+.activity { display:flex;flex-direction:column;gap:0;max-height:360px;overflow-y:auto; }
+.activity-item { display:flex;gap:10px;padding:10px 0;border-bottom:1px dashed var(--border);align-items:flex-start; }
+.activity-item:last-child { border-bottom:0; }
+.activity-avatar { width:28px;height:28px;border-radius:50%;background:var(--upcom-coral-light);color:var(--upcom-coral-dark);font-weight:700;font-size:11px;display:grid;place-items:center;flex-shrink:0; }
+.activity-body { flex:1;min-width:0; }
+.activity-text { font-size:12.5px;color:var(--ink-2);line-height:1.4; }
+.activity-text strong { color:var(--ink);font-weight:600; }
+.activity-text .tag { display:inline-block;background:var(--surface-2);border:1px solid var(--border);font-family:var(--font-mono);font-size:10.5px;padding:0px 5px;border-radius:3px;color:var(--ink-2); }
+.activity-meta { font-size:10.5px;color:var(--muted);margin-top:3px;display:flex;align-items:center;gap:6px; }
+.activity-meta .dot { width:3px;height:3px;background:var(--muted-2);border-radius:50%;display:inline-block; }
+.table-wrap { overflow-x:auto; }
+table.data { width:100%;border-collapse:separate;border-spacing:0;font-size:13px; }
+table.data th { text-align:left;font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--border);background:var(--surface-2);white-space:nowrap; }
+table.data td { padding:12px 14px;border-bottom:1px solid var(--border);color:var(--ink-2);vertical-align:middle; }
+table.data tr { transition:background 100ms;cursor:pointer; }
+table.data tbody tr:hover { background:var(--surface-2); }
+table.data tbody tr:last-child td { border-bottom:0; }
+.client-cell { display:flex;align-items:center;gap:10px; }
+.client-logo { width:28px;height:28px;border-radius:6px;display:grid;place-items:center;font-weight:700;font-size:11px;color:#fff;flex-shrink:0;font-family:var(--font-display); }
+.client-info { display:flex;flex-direction:column;line-height:1.25; }
+.client-name { font-weight:600;color:var(--ink);font-size:13px; }
+.client-sub { font-size:11px;color:var(--muted); }
+.tag-pill { display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap; }
+.tag-pill .dot { width:6px;height:6px;border-radius:50%;background:currentColor; }
+.tag-discovery { background:var(--info-bg);color:var(--info); }
+.tag-design { background:var(--upcom-coral-light);color:var(--upcom-coral-dark); }
+.tag-dev { background:var(--warn-bg);color:var(--warn); }
+.tag-qa { background:#EFE4F5;color:#6E3D9A; }
+.tag-launch { background:var(--success-bg);color:var(--success); }
+[data-theme="dark"] .tag-qa { background:#2A1A36;color:#C5A0E0; }
+.progress { display:flex;align-items:center;gap:8px; }
+.progress-bar { width:100%;height:6px;background:var(--border);border-radius:999px;overflow:hidden;flex:1;min-width:60px; }
+.progress-fill { height:100%;background:var(--upcom-coral);border-radius:999px;transition:width 400ms cubic-bezier(.2,.7,.2,1); }
+.progress-fill.done { background:var(--success); }
+.progress-fill.late { background:var(--danger); }
+.progress-num { font-family:var(--font-mono);font-size:11.5px;font-weight:600;color:var(--ink-2);width:36px;text-align:right; }
+.team-stack { display:flex; }
+.team-stack .avatar { width:24px;height:24px;font-size:9.5px;border:2px solid var(--surface);margin-left:-7px; }
+.team-stack .avatar:first-child { margin-left:0; }
+.team-stack .more { background:var(--surface-2);color:var(--muted);border:2px solid var(--surface);font-size:9.5px;width:24px;height:24px;display:grid;place-items:center;border-radius:50%;margin-left:-7px;font-weight:600; }
+.health { display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600; }
+.health .pulse { width:7px;height:7px;border-radius:50%;background:var(--success);position:relative; }
+.health.warn .pulse { background:var(--warn); }
+.health.danger .pulse { background:var(--danger); }
+.health .pulse::before { content:"";position:absolute;inset:-3px;border-radius:50%;background:currentColor;opacity:0.25;animation:pulse 1.6s ease-out infinite; }
+@keyframes pulse { 0%{transform:scale(0.8);opacity:0.4} 100%{transform:scale(2.2);opacity:0} }
+.deadline-cell { font-family:var(--font-mono);font-size:12px; }
+.deadline-cell.late { color:var(--danger);font-weight:600; }
+.deadline-cell.soon { color:var(--warn);font-weight:600; }
+.row-action { background:transparent;border:0;padding:4px 8px;border-radius:4px;color:var(--muted);display:grid;place-items:center; }
+.row-action:hover { background:var(--border);color:var(--ink); }
+::-webkit-scrollbar { width:10px;height:10px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border-strong);border-radius:999px;border:2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background:var(--muted-2); }
+@media (max-width:1280px) {
+  .kpi-row { grid-template-columns:repeat(4,1fr); }
+  .kpi:nth-child(4) { border-right:0; }
+  .kpi:nth-child(n+5) { border-top:1px solid var(--border); }
+  .kpi:nth-child(7) { border-right:0; }
+  .grid-3 { grid-template-columns:1fr 1fr; }
+  .grid-3>:first-child { grid-column:1/-1; }
+}
+@media (max-width:900px) {
+  .app { grid-template-columns:var(--sidebar-w-collapsed) 1fr; }
+  .sidebar .nav-label,.sidebar .nav-section-label,.sidebar .brand-text,.sidebar-footer-text { display:none; }
+  .nav-item { justify-content:center; }
+  .grid-3,.grid-2 { grid-template-columns:1fr; }
+  .kpi-row { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script>
+// Auth guard — redireciona para login se não houver sessão válida
+(function() {
+  try {
+    const s = JSON.parse(localStorage.getItem('upcom_session'));
+    if (!s || !s.user) throw new Error();
+    window.UPCOM_USER = s;
+  } catch(e) {
+    window.location.replace('login.html');
+    document.write('');
+  }
+  window.upcomLogout = function() {
+    localStorage.removeItem('upcom_session');
+    window.location.replace('login.html');
+  };
+})();
+</script>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script>
+// UPCOM Digital — Sample CRM data
+window.UPCOM_DATA = {
+  user: { name: "Rafael Mendes", role: "Founder & Head of Design", initials: "RM" },
+  kpis: [
+    { id: "mrr", label: "MRR", value: 184320, currency: "R$", format: "currency", trend: 12.4, vs: "vs. mês anterior", spark: [40,42,38,45,48,52,55,58,62,68,70,75] },
+    { id: "billing", label: "Faturamento do mês", value: 412900, currency: "R$", format: "currency", trend: 18.2, vs: "vs. abr/2025", spark: [30,35,33,42,48,55,52,60,65,70,78,82] },
+    { id: "clients", label: "Clientes ativos", value: 47, format: "int", trend: 8.7, vs: "+4 este mês", spark: [38,39,40,41,42,42,43,44,45,46,47,47] },
+    { id: "leads", label: "Novos leads", value: 128, format: "int", trend: 22.1, vs: "vs. mês anterior", spark: [60,72,80,75,90,95,100,108,112,118,124,128], featured: true },
+    { id: "conversion", label: "Taxa de conversão", value: 24.6, format: "percent", trend: 3.2, vs: "média 90 dias", spark: [18,19,20,22,21,23,22,24,23,25,24,24] },
+    { id: "projects", label: "Projetos ativos", value: 19, format: "int", trend: -2.1, vs: "3 entregas em maio", spark: [22,21,21,20,20,19,19,20,19,19,19,19] },
+    { id: "tasks", label: "Tarefas pendentes", value: 87, format: "int", trend: -14.5, vs: "12 vencendo hoje", spark: [110,108,102,98,95,92,90,89,88,87,87,87] },
+  ],
+  revenue: {
+    target: 450000, actual: 412900, pipeline: 287400,
+    months: ["Jun","Jul","Ago","Set","Out","Nov","Dez","Jan","Fev","Mar","Abr","Mai"],
+    actuals: [186,210,232,268,294,312,342,358,376,395,412,null],
+    targets: [200,210,225,250,280,300,320,340,360,385,400,420],
+  },
+  funnel: [
+    { stage: "Leads recebidos", count: 128, pct: 100, conv: null },
+    { stage: "Qualificados (MQL)", count: 84, pct: 65, conv: 65.6 },
+    { stage: "Reunião agendada", count: 52, pct: 41, conv: 61.9 },
+    { stage: "Proposta enviada", count: 38, pct: 30, conv: 73.1 },
+    { stage: "Em negociação", count: 24, pct: 19, conv: 63.2 },
+    { stage: "Fechados (won)", count: 14, pct: 11, conv: 58.3 },
+  ],
+  activity: [
+    { who: "Júlia Tavares", initials: "JT", action: "fechou o projeto", target: "Nova Skin — Site Institucional", tag: "PRJ-204", time: "há 8 min", type: "win" },
+    { who: "Marcos Lima", initials: "ML", action: "subiu deploy de homologação para", target: "Anima Pet — App Tutor", tag: "PRJ-198", time: "há 24 min", type: "deploy" },
+    { who: "Carolina Reis", initials: "CR", action: "comentou em", target: "Ferreira Advogados — Brand Guide", tag: "PRJ-191", time: "há 1h", type: "comment" },
+    { who: "Pedro Salles", initials: "PS", action: "agendou reunião com", target: "Volpe Construtora", tag: "LD-3142", time: "há 1h", type: "meeting" },
+    { who: "Tainá Souza", initials: "TS", action: "moveu lead para", target: "Em negociação · Cliché Café", tag: "LD-3098", time: "há 2h", type: "move" },
+    { who: "Rafael Mendes", initials: "RM", action: "aprovou orçamento de", target: "R$ 38.400 · Studio Mira", tag: "PROP-072", time: "há 3h", type: "approve" },
+    { who: "Júlia Tavares", initials: "JT", action: "atribuiu 4 tarefas a", target: "time de design", tag: "SPRINT-21", time: "há 4h", type: "assign" },
+    { who: "Marcos Lima", initials: "ML", action: "enviou fatura para", target: "Olivetti Imóveis", tag: "FAT-0541", time: "há 5h", type: "invoice" },
+    { who: "Carolina Reis", initials: "CR", action: "criou novo lead", target: "Bistrô Aurora", tag: "LD-3203", time: "ontem · 18:22", type: "create" },
+  ],
+  projects: [
+    { name: "Nova Skin", domain: "novaskin.com.br", logoColor: "#1F1F1F", initials: "NS", phase: "launch", lead: "Júlia T.", team: ["JT","ML","CR"], extra: 0, deadline: "02 mai", deadlineState: "soon", progress: 96, health: "ok", value: 84500 },
+    { name: "Anima Pet", domain: "animapet.com.br", logoColor: "#3A86FF", initials: "AP", phase: "qa", lead: "Marcos L.", team: ["ML","TS","PS"], extra: 1, deadline: "08 mai", deadlineState: "", progress: 78, health: "ok", value: 62000 },
+    { name: "Ferreira Advogados", domain: "ferreiraadv.com", logoColor: "#0E2A47", initials: "FA", phase: "design", lead: "Carolina R.", team: ["CR","JT"], extra: 0, deadline: "14 mai", deadlineState: "", progress: 54, health: "ok", value: 48800 },
+    { name: "Volpe Construtora", domain: "volpe.com.br", logoColor: "#C77A1B", initials: "VC", phase: "discovery", lead: "Pedro S.", team: ["PS","RM"], extra: 0, deadline: "22 mai", deadlineState: "", progress: 18, health: "warn", value: 124000 },
+    { name: "Cliché Café", domain: "clichecafe.com", logoColor: "#7B3F00", initials: "CC", phase: "dev", lead: "Marcos L.", team: ["ML","CR","TS"], extra: 2, deadline: "29 abr", deadlineState: "late", progress: 71, health: "danger", value: 36200 },
+    { name: "Studio Mira", domain: "studiomira.co", logoColor: "#9333EA", initials: "SM", phase: "design", lead: "Júlia T.", team: ["JT","CR"], extra: 0, deadline: "11 mai", deadlineState: "", progress: 42, health: "ok", value: 38400 },
+    { name: "Olivetti Imóveis", domain: "olivetti.com.br", logoColor: "#0F766E", initials: "OI", phase: "dev", lead: "Marcos L.", team: ["ML","PS"], extra: 1, deadline: "17 mai", deadlineState: "", progress: 64, health: "ok", value: 92500 },
+    { name: "Bistrô Aurora", domain: "bistroaurora.com", logoColor: "#B91C1C", initials: "BA", phase: "discovery", lead: "Carolina R.", team: ["CR"], extra: 0, deadline: "30 mai", deadlineState: "", progress: 8, health: "ok", value: 28000 },
+  ],
+};
+</script>
+
+<script type="text/babel">
+// tweaks-panel
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;max-height:calc(100vh - 32px);display:flex;flex-direction:column;background:rgba(250,249,247,.78);color:#29261b;-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);border:.5px solid rgba(255,255,255,.6);border-radius:14px;box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;overflow-x:hidden;min-height:0}
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-swatch{appearance:none;-webkit-appearance:none;width:56px;height:22px;border:.5px solid rgba(0,0,0,.1);border-radius:6px;padding:0;cursor:default;background:transparent;flex-shrink:0}
+  .twk-swatch::-webkit-color-swatch-wrapper{padding:0}
+  .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2}
+`;
+
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null ? keyOrEdits : { [keyOrEdits]: val };
+    setValues((prev) => ({ ...prev, ...edits }));
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
+  }, []);
+  return [values, setTweak];
+}
+
+function TweaksPanel({ title = 'Tweaks', children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+  const PAD = 16;
+  const clampToViewport = React.useCallback(() => {
+    const panel = dragRef.current; if (!panel) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    offsetRef.current = { x: Math.min(Math.max(PAD, window.innerWidth - w - PAD), Math.max(PAD, offsetRef.current.x)), y: Math.min(Math.max(PAD, window.innerHeight - h - PAD), Math.max(PAD, offsetRef.current.y)) };
+    panel.style.right = offsetRef.current.x + 'px'; panel.style.bottom = offsetRef.current.y + 'px';
+  }, []);
+  React.useEffect(() => {
+    const onMsg = (e) => { const t = e?.data?.type; if (t === '__activate_edit_mode') setOpen(true); else if (t === '__deactivate_edit_mode') setOpen(false); };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+  const dismiss = () => { setOpen(false); window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*'); };
+  if (!open) return null;
+  return (<><style>{__TWEAKS_STYLE}</style><div ref={dragRef} className="twk-panel" style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}><div className="twk-hd"><b>{title}</b><button className="twk-x" onClick={dismiss}>✕</button></div><div className="twk-body">{children}</div></div></>);
+}
+
+function TweakSection({ label, title, children }) {
+  return (<><div className="twk-sect">{title || label}</div>{children}</>);
+}
+
+function TweakRadio({ label, value, options, onChange }) {
+  const trackRef = React.useRef(null);
+  const opts = options.map((o) => (typeof o === 'object' ? o : { value: o, label: o }));
+  const idx = Math.max(0, opts.findIndex((o) => o.value === value));
+  const n = opts.length;
+  const valueRef = React.useRef(value); valueRef.current = value;
+  const segAt = (clientX) => { const r = trackRef.current.getBoundingClientRect(); const inner = r.width - 4; const i = Math.floor(((clientX - r.left - 2) / inner) * n); return opts[Math.max(0, Math.min(n - 1, i))].value; };
+  const onPointerDown = (e) => { const v0 = segAt(e.clientX); if (v0 !== valueRef.current) onChange(v0); const move = (ev) => { if (!trackRef.current) return; const v = segAt(ev.clientX); if (v !== valueRef.current) onChange(v); }; const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); }; window.addEventListener('pointermove', move); window.addEventListener('pointerup', up); };
+  return (<div className="twk-row"><div className="twk-lbl"><span>{label}</span></div><div ref={trackRef} role="radiogroup" onPointerDown={onPointerDown} className="twk-seg"><div className="twk-seg-thumb" style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`, width: `calc((100% - 4px) / ${n})` }} />{opts.map((o) => (<button key={o.value} type="button" role="radio" aria-checked={o.value === value}>{o.label}</button>))}</div></div>);
+}
+
+function TweakColor({ label, value, onChange }) {
+  return (<div className="twk-row twk-row-h"><div className="twk-lbl"><span>{label}</span></div><input type="color" className="twk-swatch" value={value} onChange={(e) => onChange(e.target.value)} /></div>);
+}
+
+Object.assign(window, { useTweaks, TweaksPanel, TweakSection, TweakRadio, TweakColor });
+</script>
+
+<script type="text/babel">
+// icons
+const Icon = {
+  Search: (p) => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>),
+  Menu: (p) => (<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" {...p}><path d="M4 7h16M4 12h16M4 17h10"/></svg>),
+  Bell: (p) => (<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>),
+  Mail: (p) => (<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>),
+  Plus: (p) => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" {...p}><path d="M12 5v14M5 12h14"/></svg>),
+  Home: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="m3 11 9-7 9 7v9a2 2 0 0 1-2 2h-4v-7h-6v7H5a2 2 0 0 1-2-2z"/></svg>),
+  Users: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="9" cy="8" r="3.5"/><path d="M2 20a7 7 0 0 1 14 0"/><circle cx="17" cy="9" r="2.5"/><path d="M19 17h3a4 4 0 0 0-4-4"/></svg>),
+  Sparkles: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="m12 3 1.8 4.5L18 9l-4.2 1.5L12 15l-1.8-4.5L6 9l4.2-1.5z"/><path d="M19 14v4M17 16h4M5 17v3M3.5 18.5h3"/></svg>),
+  Folder: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 7a2 2 0 0 1 2-2h4l2 2.5h8a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>),
+  Check: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m8 12 3 3 5-6"/></svg>),
+  Dollar: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 3v18M16 7H10a3 3 0 0 0 0 6h4a3 3 0 0 1 0 6H7"/></svg>),
+  Chart: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 3v18h18"/><path d="m7 15 4-4 4 4 5-7"/></svg>),
+  Calendar: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></svg>),
+  Settings: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>),
+  Megaphone: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 11v2a2 2 0 0 0 2 2h2l8 4V5L7 9H5a2 2 0 0 0-2 2z"/><path d="M19 8a4 4 0 0 1 0 8"/></svg>),
+  ChevronRight: (p) => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="m9 6 6 6-6 6"/></svg>),
+  ArrowUp: (p) => (<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M7 14l5-5 5 5"/></svg>),
+  ArrowDown: (p) => (<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M7 10l5 5 5-5"/></svg>),
+  More: (p) => (<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" {...p}><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>),
+  Download: (p) => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 3v13m0 0-4-4m4 4 4-4M4 19h16"/></svg>),
+  Filter: (p) => (<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 5h18l-7 9v5l-4 2v-7z"/></svg>),
+};
+window.Icon = Icon;
+</script>
+
+<script type="text/babel">
+// layout — Sidebar + Topbar + Kpi + Sparkline
+const Sidebar = ({ collapsed, onToggle }) => {
+  const nav = [
+    { section: "Principal", items: [
+      { icon: "Home", label: "Dashboard", active: true },
+      { icon: "Users", label: "Clientes", badge: "47" },
+      { icon: "Sparkles", label: "Leads", badge: "12" },
+      { icon: "Folder", label: "Projetos", badge: "19" },
+      { icon: "Check", label: "Tarefas", badge: "87", href: "UPCOM Tarefas.html" },
+    ]},
+    { section: "Operação", items: [
+      { icon: "Megaphone", label: "Campanhas" },
+      { icon: "Calendar", label: "Calendário" },
+      { icon: "Mail", label: "Mensagens", badge: "5" },
+      { icon: "Dollar", label: "Financeiro" },
+      { icon: "Chart", label: "Relatórios" },
+    ]},
+    { section: "Sistema", items: [
+      { icon: "Settings", label: "Configurações" },
+    ]},
+  ];
+  return (
+    <aside className="sidebar">
+      <div className="brand"><div className="brand-mark"></div><div className="brand-text">UP<em>COM</em></div></div>
+      <nav className="nav">
+        {nav.map((sec, i) => (
+          <div className="nav-section" key={i}>
+            <div className="nav-section-label">{sec.section}</div>
+            {sec.items.map((it, j) => {
+              const Ic = window.Icon[it.icon];
+              const Tag = it.href ? "a" : "div";
+              return (
+                <Tag href={it.href} className={"nav-item" + (it.active ? " active" : "")} key={j} style={{ textDecoration: "none" }}>
+                  <Ic /><span className="nav-label">{it.label}</span>
+                  {it.badge && <span className="nav-badge">{it.badge}</span>}
+                </Tag>
+              );
+            })}
+          </div>
+        ))}
+      </nav>
+      <div className="sidebar-footer">
+        <div className="avatar" style={{background: window.UPCOM_USER.color}}>{window.UPCOM_USER.initials}</div>
+        <div className="sidebar-footer-text">
+          <div className="sidebar-footer-name">{window.UPCOM_USER.name}</div>
+          <div className="sidebar-footer-role">{window.UPCOM_USER.role}</div>
+        </div>
+        <button onClick={() => window.upcomLogout()} title="Sair" style={{marginLeft:"auto",background:"transparent",border:0,color:"var(--muted)",cursor:"pointer",padding:4,borderRadius:6,display:"grid",placeItems:"center",flexShrink:0}}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </aside>
+  );
+};
+
+const Topbar = ({ collapsed, setCollapsed }) => (
+  <header className="topbar">
+    <button className="topbar-toggle" onClick={() => setCollapsed(!collapsed)} aria-label="Toggle sidebar"><Icon.Menu /></button>
+    <div className="search"><Icon.Search /><input placeholder="Buscar clientes, projetos, leads..." /><kbd>⌘K</kbd></div>
+    <div className="topbar-spacer"></div>
+    <div className="topbar-actions">
+      <button className="icon-btn" aria-label="Mensagens"><Icon.Mail /><span className="dot"></span></button>
+      <button className="icon-btn" aria-label="Notificações"><Icon.Bell /><span className="dot"></span></button>
+      <button className="btn-primary"><Icon.Plus /> Novo lead</button>
+    </div>
+  </header>
+);
+
+const Sparkline = ({ data, color = "currentColor", w = 56, h = 18 }) => {
+  const max = Math.max(...data), min = Math.min(...data);
+  const range = max - min || 1;
+  const pts = data.map((v, i) => `${(i / (data.length - 1)) * w},${h - ((v - min) / range) * h}`).join(" ");
+  return (<svg className="kpi-spark" width={w} height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none"><polyline points={pts} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>);
+};
+
+const fmtNum = (v, fmt) => {
+  if (fmt === "currency") { if (v >= 1000) return (v / 1000).toFixed(1).replace(".", ",") + "k"; return v.toLocaleString("pt-BR"); }
+  if (fmt === "percent") return v.toFixed(1).replace(".", ",") + "%";
+  return v.toLocaleString("pt-BR");
+};
+
+const Kpi = ({ k }) => (
+  <div className={"kpi" + (k.featured ? " featured" : "")}>
+    <div className="kpi-label">{k.label}</div>
+    <div className="kpi-value">{k.currency && <span className="currency">{k.currency}</span>}{fmtNum(k.value, k.format)}</div>
+    <div className={"kpi-trend " + (k.trend >= 0 ? "up" : "down")}>{k.trend >= 0 ? <Icon.ArrowUp /> : <Icon.ArrowDown />}{Math.abs(k.trend).toFixed(1).replace(".", ",")}%<span className="vs">{k.vs}</span></div>
+    <Sparkline data={k.spark} color={k.featured ? "var(--upcom-coral)" : "var(--muted-2)"} />
+  </div>
+);
+
+window.Sidebar = Sidebar;
+window.Topbar = Topbar;
+window.Kpi = Kpi;
+window.Sparkline = Sparkline;
+</script>
+
+<script type="text/babel">
+// widgets — RevenueChart, Funnel, Activity
+const RevenueChart = () => {
+  const d = window.UPCOM_DATA.revenue;
+  const w = 560, h = 220, pad = { l: 36, r: 12, t: 12, b: 24 };
+  const cw = w - pad.l - pad.r, ch = h - pad.t - pad.b;
+  const max = 480;
+  const x = (i) => pad.l + (i / (d.months.length - 1)) * cw;
+  const y = (v) => pad.t + ch - (v / max) * ch;
+  const actualPath = d.actuals.map((v, i) => v != null ? `${i === 0 ? "M" : "L"}${x(i)},${y(v)}` : "").join(" ");
+  const targetPath = d.targets.map((v, i) => `${i === 0 ? "M" : "L"}${x(i)},${y(v)}`).join(" ");
+  const areaPath = actualPath + ` L${x(d.actuals.findLastIndex(v=>v!=null))},${y(0)} L${x(0)},${y(0)} Z`;
+  const yTicks = [0, 120, 240, 360, 480];
+  return (
+    <div className="card" style={{ minHeight: 0 }}>
+      <div className="card-header">
+        <div className="card-title-block"><h3 className="card-title">Receita & Pipeline</h3><div className="card-subtitle">Últimos 12 meses · valores em R$ mil</div></div>
+        <div className="card-actions"><button className="tab-pill">12m</button><button className="tab-pill active">YTD</button><button className="tab-pill">90d</button><button className="icon-btn"><Icon.Download /></button></div>
+      </div>
+      <div className="card-body">
+        <div className="revenue-stats">
+          <div><div className="revenue-stat-label">Faturado YTD</div><div className="revenue-stat-value"><span style={{fontSize:14,color:"var(--muted)",fontWeight:500,marginRight:2}}>R$</span>2.96M</div><div className="revenue-stat-meta"><span className="pos">↑ 28,4%</span> vs. 2025</div></div>
+          <div><div className="revenue-stat-label">Meta anual</div><div className="revenue-stat-value"><span style={{fontSize:14,color:"var(--muted)",fontWeight:500,marginRight:2}}>R$</span>4.80M</div><div className="revenue-stat-meta">61,6% atingido · 5 meses</div></div>
+          <div><div className="revenue-stat-label">Pipeline aberto</div><div className="revenue-stat-value"><span style={{fontSize:14,color:"var(--muted)",fontWeight:500,marginRight:2}}>R$</span>287k</div><div className="revenue-stat-meta">24 oportunidades · prob. 64%</div></div>
+        </div>
+        <div className="chart-legend"><span><span className="dot" style={{background:"var(--upcom-coral)"}}></span>Faturado</span><span><span className="dot" style={{background:"var(--ink)",opacity:0.35}}></span>Meta</span><span><span className="dot" style={{background:"var(--upcom-coral-light)"}}></span>Projetado</span></div>
+        <div className="chart-wrap">
+          <svg width="100%" height="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+            <defs><linearGradient id="revGrad" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stopColor="var(--upcom-coral)" stopOpacity="0.22"/><stop offset="100%" stopColor="var(--upcom-coral)" stopOpacity="0"/></linearGradient></defs>
+            {yTicks.map((t, i) => (<g key={i}><line x1={pad.l} x2={w - pad.r} y1={y(t)} y2={y(t)} stroke="var(--border)" strokeDasharray="2 3"/><text x={pad.l - 6} y={y(t) + 3} textAnchor="end" fill="var(--muted)" fontSize="9.5" fontFamily="var(--font-mono)">{t}</text></g>))}
+            {d.months.map((m, i) => (<text key={i} x={x(i)} y={h - 6} textAnchor="middle" fill="var(--muted)" fontSize="9.5">{m}</text>))}
+            <path d={areaPath} fill="url(#revGrad)"/>
+            <path d={targetPath} fill="none" stroke="var(--ink)" strokeWidth="1.5" strokeDasharray="4 3" opacity="0.4"/>
+            <path d={actualPath} fill="none" stroke="var(--upcom-coral)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+            {d.actuals.map((v, i) => v != null && (<circle key={i} cx={x(i)} cy={y(v)} r={i === d.actuals.findLastIndex(v=>v!=null) ? 4 : 2.5} fill="var(--upcom-coral)" stroke="var(--surface)" strokeWidth="1.5"/>))}
+          </svg>
+        </div>
+      </div>
+      <div className="card-footer"><span>Atualizado há 4 minutos</span><a href="#">Ver relatório completo <Icon.ChevronRight /></a></div>
+    </div>
+  );
+};
+
+const Funnel = () => {
+  const f = window.UPCOM_DATA.funnel;
+  return (
+    <div className="card">
+      <div className="card-header"><div className="card-title-block"><h3 className="card-title">Funil de vendas</h3><div className="card-subtitle">Abril 2026 · 128 leads no topo</div></div><button className="icon-btn"><Icon.More /></button></div>
+      <div className="card-body">
+        <div className="funnel">
+          {f.map((s, i) => (
+            <div className="funnel-row" key={i}>
+              <div className="funnel-bar" style={{ width: `${s.pct}%`, background: `oklch(${64 - i * 4}% ${0.18 - i * 0.012} 32)` }}>
+                <div className="funnel-stage"><span className="num">{String(i + 1).padStart(2, "0")}</span>{s.stage}</div>
+                <div className="funnel-count">{s.count}</div>
+              </div>
+              <div className="funnel-meta" style={{ width: `${s.pct}%` }}><span>{s.pct}% do topo</span>{s.conv != null && <span className="conv">→ {s.conv.toFixed(1).replace(".",",")}% conv.</span>}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="card-footer"><span>Conv. total: <strong style={{color:"var(--success)"}}>10,9%</strong></span><a href="#">Abrir pipeline <Icon.ChevronRight /></a></div>
+    </div>
+  );
+};
+
+const Activity = () => {
+  const a = window.UPCOM_DATA.activity;
+  return (
+    <div className="card">
+      <div className="card-header"><div className="card-title-block"><h3 className="card-title">Atividade da equipe</h3><div className="card-subtitle">Últimas 24h · 9 eventos</div></div><div className="card-actions"><button className="tab-pill active">Todos</button><button className="tab-pill">Vendas</button><button className="tab-pill">Entregas</button></div></div>
+      <div className="card-body">
+        <div className="activity">
+          {a.map((it, i) => (
+            <div className="activity-item" key={i}>
+              <div className="activity-avatar">{it.initials}</div>
+              <div className="activity-body">
+                <div className="activity-text"><strong>{it.who}</strong> {it.action} <strong>{it.target}</strong></div>
+                <div className="activity-meta"><span className="tag" style={{background:"var(--surface-2)",border:"1px solid var(--border)",fontFamily:"var(--font-mono)",fontSize:10,padding:"0 5px",borderRadius:3}}>{it.tag}</span><span className="dot"></span><span>{it.time}</span></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="card-footer"><span>9 de 24 eventos hoje</span><a href="#">Ver tudo <Icon.ChevronRight /></a></div>
+    </div>
+  );
+};
+
+window.RevenueChart = RevenueChart;
+window.Funnel = Funnel;
+window.Activity = Activity;
+</script>
+
+<script type="text/babel">
+// projects-table
+const phaseTags = { discovery:{cls:"tag-discovery",label:"Discovery"}, design:{cls:"tag-design",label:"Design"}, dev:{cls:"tag-dev",label:"Desenvolvimento"}, qa:{cls:"tag-qa",label:"QA"}, launch:{cls:"tag-launch",label:"Lançamento"} };
+const ProjectsTable = () => {
+  const [filter, setFilter] = React.useState("all");
+  const all = window.UPCOM_DATA.projects;
+  const projects = filter === "all" ? all : all.filter(p => p.phase === filter);
+  return (
+    <div className="card">
+      <div className="card-header">
+        <div className="card-title-block"><h3 className="card-title">Projetos ativos</h3><div className="card-subtitle">{projects.length} projetos · valor total {(projects.reduce((s,p)=>s+p.value,0)/1000).toFixed(0)}k em entrega</div></div>
+        <div className="card-actions" style={{flexWrap:"wrap"}}>
+          {[["all","Todos"],["discovery","Discovery"],["design","Design"],["dev","Dev"],["qa","QA"],["launch","Launch"]].map(([k,l]) => (<button key={k} className={"tab-pill" + (filter === k ? " active" : "")} onClick={() => setFilter(k)}>{l}</button>))}
+          <button className="btn-secondary"><Icon.Filter /> Filtros</button>
+          <button className="btn-secondary"><Icon.Download /></button>
+        </div>
+      </div>
+      <div className="table-wrap">
+        <table className="data">
+          <thead><tr><th style={{paddingLeft:18,width:"24%"}}>Cliente / Projeto</th><th>Fase</th><th>Responsável</th><th>Equipe</th><th style={{width:"18%"}}>Progresso</th><th>Prazo</th><th>Valor</th><th>Saúde</th><th style={{paddingRight:18}}></th></tr></thead>
+          <tbody>
+            {projects.map((p, i) => {
+              const phase = phaseTags[p.phase];
+              const fillCls = p.progress >= 95 ? "done" : p.deadlineState === "late" ? "late" : "";
+              return (
+                <tr key={i}>
+                  <td style={{paddingLeft:18}}><div className="client-cell"><div className="client-logo" style={{background:p.logoColor}}>{p.initials}</div><div className="client-info"><div className="client-name">{p.name}</div><div className="client-sub">{p.domain}</div></div></div></td>
+                  <td><span className={"tag-pill " + phase.cls}><span className="dot"></span>{phase.label}</span></td>
+                  <td>{p.lead}</td>
+                  <td><div className="team-stack">{p.team.map((t, k) => (<div className="avatar" key={k} style={{background:`oklch(${55+k*6}% 0.14 ${20+k*40})`}}>{t}</div>))}{p.extra > 0 && <div className="more">+{p.extra}</div>}</div></td>
+                  <td><div className="progress"><div className="progress-bar"><div className={"progress-fill " + fillCls} style={{width:p.progress+"%"}}></div></div><span className="progress-num">{p.progress}%</span></div></td>
+                  <td><span className={"deadline-cell " + (p.deadlineState||"")}>{p.deadline}</span></td>
+                  <td style={{fontFamily:"var(--font-mono)",fontSize:12}}>R$ {(p.value/1000).toFixed(1).replace(".",",")}k</td>
+                  <td><span className={"health " + (p.health==="ok"?"":p.health)}><span className="pulse"></span>{p.health==="ok"?"No prazo":p.health==="warn"?"Atenção":"Atrasado"}</span></td>
+                  <td style={{paddingRight:18}}><button className="row-action"><Icon.More /></button></td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div className="card-footer"><span>Mostrando {projects.length} de {all.length} projetos</span><a href="#">Abrir gestão de projetos <Icon.ChevronRight /></a></div>
+    </div>
+  );
+};
+window.ProjectsTable = ProjectsTable;
+</script>
+
+<script type="text/babel">
+// app — main
+const TWEAK_DEFAULTS = { "primaryColor": "#E85D44", "theme": "light" };
+
+const App = () => {
+  const [tweaks, setTweak] = window.useTweaks(TWEAK_DEFAULTS);
+  const [collapsed, setCollapsed] = React.useState(false);
+  const [period, setPeriod] = React.useState("30d");
+
+  React.useEffect(() => {
+    document.documentElement.style.setProperty("--upcom-coral", tweaks.primaryColor);
+    document.documentElement.setAttribute("data-theme", tweaks.theme);
+  }, [tweaks.primaryColor, tweaks.theme]);
+
+  const kpis = window.UPCOM_DATA.kpis;
+
+  return (
+    <>
+      <div className={"app" + (collapsed ? " collapsed" : "")}>
+        <Sidebar collapsed={collapsed} />
+        <div className="main">
+          <Topbar collapsed={collapsed} setCollapsed={setCollapsed} />
+          <div className="content">
+            <div className="page-header">
+              <div className="page-title-block">
+                <h1 className="page-title">Bom dia, Rafael 👋</h1>
+                <div className="page-subtitle">Você tem <strong>12 tarefas</strong> vencendo hoje e <strong>3 propostas</strong> aguardando resposta.</div>
+              </div>
+              <div className="filters">
+                <div className="segmented">
+                  {[["7d","7 dias"],["30d","30 dias"],["90d","Trimestre"],["ytd","YTD"]].map(([k,l]) => (
+                    <button key={k} className={period===k?"active":""} onClick={()=>setPeriod(k)}>{l}</button>
+                  ))}
+                </div>
+                <button className="btn-secondary"><Icon.Calendar /> 1–30 abr 2026</button>
+                <button className="btn-secondary"><Icon.Download /> Exportar</button>
+              </div>
+            </div>
+            <div className="kpi-row">{kpis.map(k => <Kpi key={k.id} k={k} />)}</div>
+            <div className="grid-3"><RevenueChart /><Funnel /><Activity /></div>
+            <ProjectsTable />
+          </div>
+        </div>
+      </div>
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Marca"><TweakColor label="Cor primária" value={tweaks.primaryColor} onChange={v => setTweak("primaryColor", v)} /></TweakSection>
+        <TweakSection title="Aparência"><TweakRadio label="Tema" value={tweaks.theme} onChange={v => setTweak("theme", v)} options={[{value:"light",label:"Claro"},{value:"dark",label:"Escuro"}]} /></TweakSection>
+        <TweakSection title="Cores rápidas">
+          <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
+            {[["#E85D44","Coral"],["#0E0E0E","Preto"],["#2C6BB8","Azul"],["#2F8F5F","Verde"],["#9333EA","Roxo"],["#C77A1B","Âmbar"]].map(([c,n]) => (
+              <button key={c} onClick={()=>setTweak("primaryColor",c)} title={n} style={{width:32,height:32,borderRadius:8,background:c,border:tweaks.primaryColor===c?"2px solid var(--ink)":"1px solid var(--border)",cursor:"pointer",padding:0}} />
+            ))}
+          </div>
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
