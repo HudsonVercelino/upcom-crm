@@ -289,7 +289,7 @@
   // Se já estiver logado, vai direto pro dashboard
   try {
     const s = JSON.parse(localStorage.getItem('upcom_session'));
-    if (s && USERS[s.user]) window.location.replace('UPCOM Dashboard.html');
+    if (s && USERS[s.user]) window.location.replace('dashboard.html');
   } catch(e) {}
 
   let selectedUser = null;
@@ -317,7 +317,7 @@
         role: user.role,
         color: user.color,
       }));
-      window.location.replace('UPCOM Dashboard.html');
+      window.location.replace('dashboard.html');
     } else {
       const input = document.getElementById('pw-input');
       input.value = '';
